@@ -1,4 +1,4 @@
-package com.richmond.whatsforlunch.controller;
+package com.richmond.whatsforlunch.common.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.util.Assert;
@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * Standard response body
- * @param data body content
- * @param <T>
+ * @param data body data
+ * @param <T> data type
  */
 public record StandardResponse<T> (@JsonProperty("data") Collection<T> data) {
 

@@ -1,4 +1,4 @@
-package com.richmond.whatsforlunch.respository.entity;
+package com.richmond.whatsforlunch.users.repository.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,7 +1,7 @@
-package com.richmond.whatsforlunch.controller;
+package com.richmond.whatsforlunch.users.controller;
 
-import com.richmond.whatsforlunch.service.UserService;
-import com.richmond.whatsforlunch.service.dto.User;
+import com.richmond.whatsforlunch.users.service.UserService;
+import com.richmond.whatsforlunch.users.service.dto.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

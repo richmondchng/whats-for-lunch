@@ -1,8 +1,8 @@
-package com.richmond.whatsforlunch.service;
+package com.richmond.whatsforlunch.users.service;
 
-import com.richmond.whatsforlunch.respository.UserRepository;
-import com.richmond.whatsforlunch.respository.entity.UserEntity;
-import com.richmond.whatsforlunch.service.dto.User;
+import com.richmond.whatsforlunch.users.repository.UserRepository;
+import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
+import com.richmond.whatsforlunch.users.service.dto.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

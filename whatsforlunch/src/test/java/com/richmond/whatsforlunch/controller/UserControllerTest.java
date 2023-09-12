@@ -10,12 +10,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +39,8 @@ class UserControllerTest {
     void givenNoUsers_whenGetUsers_returnEmptyArray() throws Exception {
         mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[]"));
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(0)));
 
         verify(userService, times(1)).getAllUsers();
     }
@@ -56,14 +57,16 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].userName", is("adamt")))
-                .andExpect(jsonPath("$[0].firstName", is("adam")))
-                .andExpect(jsonPath("$[0].lastName", is("tan")))
-                .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].userName", is("johno")))
-                .andExpect(jsonPath("$[1].firstName", is("john")))
-                .andExpect(jsonPath("$[1].lastName", is("ong")));
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].userName", is("adamt")))
+                .andExpect(jsonPath("$.data[0].firstName", is("adam")))
+                .andExpect(jsonPath("$.data[0].lastName", is("tan")))
+                .andExpect(jsonPath("$.data[1].id", is(2)))
+                .andExpect(jsonPath("$.data[1].userName", is("johno")))
+                .andExpect(jsonPath("$.data[1].firstName", is("john")))
+                .andExpect(jsonPath("$.data[1].lastName", is("ong")));
 
         verify(userService, times(1)).getAllUsers();
     }

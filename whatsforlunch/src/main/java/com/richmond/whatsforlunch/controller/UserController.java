@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,8 +22,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<User>> getUsers() {
-        return ResponseEntity.ok(List.copyOf(userService.getAllUsers()));
+    public ResponseEntity<StandardResponse<User>> getUsers() {
+        return ResponseEntity.ok(new StandardResponse<>(List.copyOf(userService.getAllUsers())));
     }
 }
 

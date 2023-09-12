@@ -54,6 +54,12 @@
 			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -1,7 +1,7 @@
-package com.richmond.whatsforlunch.controllers;
+package com.richmond.whatsforlunch.controller;
 
-import com.richmond.whatsforlunch.services.UserService;
-import com.richmond.whatsforlunch.services.dto.User;
+import com.richmond.whatsforlunch.service.UserService;
+import com.richmond.whatsforlunch.service.dto.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

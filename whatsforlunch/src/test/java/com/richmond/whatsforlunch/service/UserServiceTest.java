@@ -1,8 +1,8 @@
-package com.richmond.whatsforlunch.services;
+package com.richmond.whatsforlunch.service;
 
 import com.richmond.whatsforlunch.respository.UserRepository;
 import com.richmond.whatsforlunch.respository.entity.UserEntity;
-import com.richmond.whatsforlunch.services.dto.User;
+import com.richmond.whatsforlunch.service.dto.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

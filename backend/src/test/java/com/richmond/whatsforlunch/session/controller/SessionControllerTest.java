@@ -58,7 +58,7 @@ class SessionControllerTest {
     void givenRequestBodyIsValid_whenCreateNewSession_returnNewSession() throws Exception {
 
         when(sessionService.createNewSession(any(LocalDate.class), anyLong(), anyCollection())).thenReturn(
-          new Session(99L, LocalDate.of(2023, 9, 12), 2L, List.of(2L, 5L, 6L, 7L))
+          new Session(99L, LocalDate.of(2023, 9, 12), 2L, List.of(2L, 5L, 6L, 7L), 1)
         );
 
         final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5, 6, 7]}";

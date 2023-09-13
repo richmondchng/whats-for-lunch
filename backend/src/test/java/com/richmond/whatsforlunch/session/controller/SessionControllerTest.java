@@ -1,6 +1,9 @@
 package com.richmond.whatsforlunch.session.controller;
 
+import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.SessionService;
+import com.richmond.whatsforlunch.session.service.dto.Owner;
+import com.richmond.whatsforlunch.session.service.dto.Participant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -58,29 +61,42 @@ class SessionControllerTest {
     void givenRequestBodyIsValid_whenCreateNewSession_returnNewSession() throws Exception {
 
         when(sessionService.createNewSession(any(LocalDate.class), anyLong(), anyCollection())).thenReturn(
-          new Session(99L, LocalDate.of(2023, 9, 12), 2L, List.of(2L, 5L, 6L, 7L), 1)
+          new Session(99L, LocalDate.of(2023, 9, 12),
+                  new Owner(2L, "ed", "Edward"),
+                  List.of(new Participant(2L, "ed", "Edward", "PENDING"),
+                          new Participant(5L, "peggy", "Peggy", "PENDING")),
+                  SessionStatus.OPEN.getName(), 1)
         );
 
-        final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5, 6, 7]}";
+        final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
         mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].id", is(99)))
                 .andExpect(jsonPath("$.data[0].date", is("2023-09-12")))
-                .andExpect(jsonPath("$.data[0].owner", is(2)))
+                .andExpect(jsonPath("$.data[0].owner.id", is(2)))
+                .andExpect(jsonPath("$.data[0].owner.userName", is("ed")))
+                .andExpect(jsonPath("$.data[0].owner.displayName", is("Edward")))
+                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
                 .andExpect(jsonPath("$.data[0].participants").isArray())
-                .andExpect(jsonPath("$.data[0].participants", hasSize(4)))
-                .andExpect(jsonPath("$.data[0].participants[0]", is(2)))
-                .andExpect(jsonPath("$.data[0].participants[1]", is(5)))
-                .andExpect(jsonPath("$.data[0].participants[2]", is(6)))
-                .andExpect(jsonPath("$.data[0].participants[3]", is(7)));
+                .andExpect(jsonPath("$.data[0].participants", hasSize(2)))
+
+                .andExpect(jsonPath("$.data[0].participants[0].id", is(2)))
+                .andExpect(jsonPath("$.data[0].participants[0].userName", is("ed")))
+                .andExpect(jsonPath("$.data[0].participants[0].displayName", is("Edward")))
+                .andExpect(jsonPath("$.data[0].participants[0].status", is("PENDING")))
+
+                .andExpect(jsonPath("$.data[0].participants[1].id", is(5)))
+                .andExpect(jsonPath("$.data[0].participants[1].userName", is("peggy")))
+                .andExpect(jsonPath("$.data[0].participants[1].displayName", is("Peggy")))
+                .andExpect(jsonPath("$.data[0].participants[1].status", is("PENDING")));
 
         verify(sessionService, times(1)).createNewSession(
                 eq(LocalDate.of(2023, 9, 12)),
                 eq(2L),
                 participantsCaptor.capture());
-        final Set<Long> expectedParticipants = Stream.of(2L, 5L, 6L, 7L).collect(Collectors.toSet());
+        final Set<Long> expectedParticipants = Stream.of(2L, 5L).collect(Collectors.toSet());
         final Iterator<Long> itr = participantsCaptor.getValue().iterator();
         while(itr.hasNext()) {
             final long id = itr.next();

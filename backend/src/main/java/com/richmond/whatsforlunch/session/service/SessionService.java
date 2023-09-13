@@ -1,7 +1,6 @@
 package com.richmond.whatsforlunch.session.service;
 
 import com.richmond.whatsforlunch.session.exception.UserNotFoundException;
-import com.richmond.whatsforlunch.session.repository.ParticipantRepository;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantId;
@@ -37,8 +36,6 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
-
-    private final ParticipantRepository participantRepository;
 
     /**
      * Create new session.

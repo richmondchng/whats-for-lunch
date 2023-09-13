@@ -1,6 +1,5 @@
 package com.richmond.whatsforlunch.session.service;
 
-import com.richmond.whatsforlunch.session.repository.ParticipantRepository;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantStatus;
@@ -54,15 +53,12 @@ class SessionServiceTest {
     @Mock
     private SessionRepository sessionRepository;
 
-    @Mock
-    private ParticipantRepository participantRepository;
-
     // test instance
     private SessionService sessionService;
 
     @BeforeEach
     void setUp() {
-        sessionService = new SessionService(sessionRepository, userRepository, participantRepository);
+        sessionService = new SessionService(sessionRepository, userRepository);
     }
 
     @AfterEach

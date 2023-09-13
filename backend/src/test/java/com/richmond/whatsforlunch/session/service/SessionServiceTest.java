@@ -15,20 +15,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -172,5 +179,65 @@ class SessionServiceTest {
         assertEquals(ParticipantStatus.PENDING, pe2.getStatus());
 
         assertFalse(itrE.hasNext());
+    }
+
+    @Captor
+    private ArgumentCaptor<Set<SessionStatus>> setStatusCaptor;
+
+    /**
+     * Given owner ID, when get sessions by owner, return sessions
+     */
+    @Test
+    void givenOwnerId_whenGetSessionsByOwner_returnSessionsByOwner() {
+        // given
+        when(sessionRepository.findByOwnerAndStatus(anyLong(), anySet())).thenReturn(
+                List.of(SessionEntity.builder()
+                        .id(3L).date(LocalDate.of(2023, 9, 12))
+                        .owner(UserEntity.builder().id(2L).build())
+                        .participants(new ArrayList<>())
+                        .status(SessionStatus.OPEN)
+                        .build())
+        );
+
+        // when
+        final List<Session> results = sessionService.getSessionsByOwner(2L, List.of("OPEN", "CLOSED", "COMPLETED"));
+
+        // then
+        assertEquals(1, results.size());
+        assertEquals(3L, results.get(0).id());
+
+        verify(sessionRepository, times(1)).findByOwnerAndStatus(eq(2L), setStatusCaptor.capture());
+        final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
+        assertEquals(2, paramStatus.size());
+        assertTrue(paramStatus.contains(SessionStatus.OPEN));
+        assertTrue(paramStatus.contains(SessionStatus.CLOSED));
+    }
+
+    /**
+     * Given participant ID, when get sessions by participant, return sessions
+     */
+    @Test
+    void givenParticipantId_whenGetSessionsByParticipant_returnSessionsByParticipant() {
+        // given
+        when(sessionRepository.findByParticipantAndStatus(anyLong(), anySet())).thenReturn(
+                List.of(SessionEntity.builder()
+                        .id(3L).date(LocalDate.of(2023, 9, 12))
+                        .owner(UserEntity.builder().id(2L).build())
+                        .participants(new ArrayList<>())
+                        .status(SessionStatus.OPEN)
+                        .build())
+        );
+
+        // when
+        final List<Session> results = sessionService.getSessionsByParticipant(2L, List.of("OPEN"));
+
+        // then
+        assertEquals(1, results.size());
+        assertEquals(3L, results.get(0).id());
+
+        verify(sessionRepository, times(1)).findByParticipantAndStatus(eq(2L), setStatusCaptor.capture());
+        final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
+        assertEquals(1, paramStatus.size());
+        assertTrue(paramStatus.contains(SessionStatus.OPEN));
     }
 }

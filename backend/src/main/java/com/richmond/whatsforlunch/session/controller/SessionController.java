@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller to manage session
@@ -43,21 +43,42 @@ public class SessionController {
 
         final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
         // return created session
-        return ResponseEntity.ok(new StandardResponse<>(mapToCreateNewSessionBean(session)));
+        return ResponseEntity.ok(new StandardResponse<>(mapToBean(session)));
     }
 
+    /**
+     * Get sessions.
+     * @param status list of status to returned
+     * @param owner filtered by owner ID
+     * @param participant filtered by participant ID
+     * @return list of sessions
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StandardResponse<Collection<ResponseSession>>> getSessions(
-            @RequestParam(defaultValue = "OPEN,CLOSED") final String[] status,
-            @RequestParam(defaultValue = "false") final boolean includeDeleted) {
-        return null;
+    public ResponseEntity<StandardResponse<ResponseSession>> getSessions(
+            @RequestParam(defaultValue = "OPEN,CLOSED") final List<String> status,
+            @RequestParam(required = false) final Long owner,
+            @RequestParam(required = false) final Long participant) {
+
+        final List<Session> results;
+        if(owner != null) {
+            results = sessionService.getSessionsByOwner(owner, status);
+        } else if(participant != null) {
+            results = sessionService.getSessionsByParticipant(participant, status);
+        } else {
+            results = new ArrayList<>(0);
+        }
+        return ResponseEntity.ok(new StandardResponse<>(mapToBean(results)));
     }
 
 
-    private ResponseSession mapToCreateNewSessionBean(final Session session) {
+    private List<ResponseSession> mapToBean(final List<Session> sessions) {
+        return sessions.stream().map(this::mapToBean).toList();
+    }
+
+    private ResponseSession mapToBean(final Session session) {
         return new ResponseSession(session.id(), session.date(),
                 mapToBean(session.owner()),
-                session.participants().stream().map(this::mapToBean).collect(Collectors.toUnmodifiableList()),
+                session.participants().stream().map(this::mapToBean).toList(),
                 session.status());
     }
 
@@ -76,7 +97,7 @@ public class SessionController {
  * @param owner session owner id
  * @param participants collection of participants' Ids
  */
-record RequestCreateNewSession(LocalDate date, long owner, Collection<Long> participants) {}
+record RequestCreateNewSession(LocalDate date, long owner, List<Long> participants) {}
 
 /**
  * Response body when new session is created.
@@ -85,7 +106,7 @@ record RequestCreateNewSession(LocalDate date, long owner, Collection<Long> part
  * @param owner session owner id
  * @param participants collection of participants' Ids
  */
-record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner, Collection<ResponseSessionParticipant> participants, String status) {}
+record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner, List<ResponseSessionParticipant> participants, String status) {}
 
 record ResponseSessionOwner(long id, String userName, String displayName) {}
 

@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,7 +40,14 @@ public class SessionService {
 
     private final ParticipantRepository participantRepository;
 
-    public Session createNewSession(final LocalDate date, final long ownerId, final Collection<Long> participantIds) {
+    /**
+     * Create new session.
+     * @param date for date
+     * @param ownerId by owner
+     * @param participantIds with participants
+     * @return newly created session
+     */
+    public Session createNewSession(final LocalDate date, final long ownerId, final List<Long> participantIds) {
 
         final List<Long> userIds = new ArrayList<>();
         userIds.addAll(participantIds);
@@ -93,5 +100,32 @@ public class SessionService {
     private Participant mapToBean(final ParticipantEntity entity) {
         return new Participant(entity.getUser().getId(), entity.getUser().getUserName(), entity.getUser().getFirstName(),
                 entity.getStatus().getName());
+    }
+
+    /**
+     * Get collection of sessions by owner and status
+     * @param ownerId owner ID
+     * @param status array of status
+     * @return collection of session
+     */
+    public List<Session> getSessionsByOwner(final long ownerId, final List<String> status) {
+        return sessionRepository.findByOwnerAndStatus(ownerId, getStatusObject(status))
+                .stream().map(this::mapToBean).collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * Get collection of sessions by participant and status
+     * @param participantId participant ID
+     * @param status array of status
+     * @return collection of session
+     */
+    public List<Session> getSessionsByParticipant(final long participantId, final List<String> status) {
+        return sessionRepository.findByParticipantAndStatus(participantId, getStatusObject(status))
+                .stream().map(this::mapToBean).collect(Collectors.toUnmodifiableList());
+    }
+
+    private Set<SessionStatus> getStatusObject(final List<String> status) {
+        return status.stream().map(s -> SessionStatus.find(s)).filter(s -> s != null)
+                .collect(Collectors.toUnmodifiableSet());
     }
 }

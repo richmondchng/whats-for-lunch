@@ -1,9 +1,9 @@
 package com.richmond.whatsforlunch.session.controller;
 
 import com.richmond.whatsforlunch.common.controller.StandardResponse;
+import com.richmond.whatsforlunch.session.controller.dto.ResponseSession;
+import com.richmond.whatsforlunch.session.controller.dto.ResponseSessionUtil;
 import com.richmond.whatsforlunch.session.service.SessionService;
-import com.richmond.whatsforlunch.session.service.dto.Owner;
-import com.richmond.whatsforlunch.session.service.dto.Participant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,7 +43,7 @@ public class SessionController {
 
         final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
         // return created session
-        return ResponseEntity.ok(new StandardResponse<>(mapToBean(session)));
+        return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(session)));
     }
 
     /**
@@ -67,27 +67,7 @@ public class SessionController {
         } else {
             results = new ArrayList<>(0);
         }
-        return ResponseEntity.ok(new StandardResponse<>(mapToBean(results)));
-    }
-
-
-    private List<ResponseSession> mapToBean(final List<Session> sessions) {
-        return sessions.stream().map(this::mapToBean).toList();
-    }
-
-    private ResponseSession mapToBean(final Session session) {
-        return new ResponseSession(session.id(), session.date(),
-                mapToBean(session.owner()),
-                session.participants().stream().map(this::mapToBean).toList(),
-                session.status());
-    }
-
-    private ResponseSessionOwner mapToBean(final Owner bean) {
-        return new ResponseSessionOwner(bean.id(), bean.userName(), bean.displayName());
-    }
-
-    private ResponseSessionParticipant mapToBean(final Participant bean) {
-        return new ResponseSessionParticipant(bean.id(), bean.userName(), bean.displayName(), bean.status());
+        return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(results)));
     }
 }
 
@@ -99,16 +79,4 @@ public class SessionController {
  */
 record RequestCreateNewSession(LocalDate date, long owner, List<Long> participants) {}
 
-/**
- * Response body when new session is created.
- * @param id session id
- * @param date session date
- * @param owner session owner id
- * @param participants collection of participants' Ids
- */
-record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner, List<ResponseSessionParticipant> participants, String status) {}
-
-record ResponseSessionOwner(long id, String userName, String displayName) {}
-
-record ResponseSessionParticipant(long id, String userName, String displayName, String status) {}
 

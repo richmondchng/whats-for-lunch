@@ -73,7 +73,7 @@ class ParticipantControllerTest {
     }
 
     /**
-     * Given request body is valid, when invoke POST /api/v1/sessions/{sessionId}/participants, return success status
+     * Given request body is valid, when invoke DELETE /api/v1/sessions/{sessionId}/participants, return success status
      * @throws Exception exception
      */
     @Test
@@ -90,11 +90,8 @@ class ParticipantControllerTest {
         verify(participantService, times(1)).addParticipantsToSession(eq(2L), eq(List.of(6L, 7L)));
     }
 
-
-
-
     /**
-     * Given request is valid, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, return success status
+     * Given request is valid, when invoke DELETE /api/v1/sessions/{sessionId}/participants/{participantId}, return success status
      * @throws Exception exception
      */
     @Test
@@ -110,7 +107,7 @@ class ParticipantControllerTest {
     }
 
     /**
-     * Given path session ID is zero, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
+     * Given path session ID is zero, when invoke DELETE /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
      * @throws Exception exception
      */
     @Test
@@ -128,7 +125,7 @@ class ParticipantControllerTest {
     }
 
     /**
-     * Given path restaurant ID is zero, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
+     * Given path restaurant ID is zero, when invoke DELETE /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
      * @throws Exception exception
      */
     @Test

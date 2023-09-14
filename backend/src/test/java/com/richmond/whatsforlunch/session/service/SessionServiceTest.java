@@ -256,7 +256,7 @@ class SessionServiceTest {
             sessionService.getSessionById(999L);
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
-            assertEquals("Session not found", e.getMessage());
+            assertEquals("Session ID is invalid", e.getMessage());
         }
 
         // then
@@ -314,5 +314,52 @@ class SessionServiceTest {
         assertEquals("McFried Chicken", restaurant.restaurant());
         assertEquals("Yummy fried chicken", restaurant.description());
         assertEquals("ACTIVE", restaurant.status());
+    }
+
+    /**
+     * Given session ID provided is invalid, when deleteSession, throw exception
+     */
+    @Test
+    void givenSessionIdInvalid_whenDeleteSession_throwException() {
+        // given
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when
+        try {
+            sessionService.deleteSession(99999L);
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Session ID is invalid", e.getMessage());
+        }
+
+        // verify
+        verify(sessionRepository, times(1)).findById(eq(99999L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given session ID provided, when deleteSession, flag session as deleted
+     */
+    @Test
+    void givenSessionId_whenDeleteSession_flagSessionAsDeleted() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .build();
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        sessionService.deleteSession(15L);
+
+        // verify
+        verify(sessionRepository, times(1)).findById(eq(15L));
+        final ArgumentCaptor<SessionEntity> captor = ArgumentCaptor.forClass(SessionEntity.class);
+        verify(sessionRepository, times(1)).saveAndFlush(captor.capture());
+        final SessionEntity result = captor.getValue();
+        assertEquals(15L, session.getId());
+        assertEquals(SessionStatus.DELETED, session.getStatus());
     }
 }

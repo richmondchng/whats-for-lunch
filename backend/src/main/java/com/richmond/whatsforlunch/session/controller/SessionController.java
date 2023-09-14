@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -83,6 +85,23 @@ public class SessionController {
         final Session session = sessionService.getSessionById(id);
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
+
+    /**
+     * Delete session.
+     * @param id session ID
+     * @return action status
+     */
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id) {
+        Assert.isTrue(id > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
+        sessionService.deleteSession(id);
+        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(ApplicationMessages.SUCCESS_MESSAGE)));
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StandardResponse<String>> patchSession(@PathVariable final long id, @RequestBody final RequestPatchSession body) {
+        return null;
+    }
 }
 
 /**
@@ -92,5 +111,9 @@ public class SessionController {
  * @param participants collection of participants' Ids
  */
 record RequestCreateNewSession(LocalDate date, long owner, List<Long> participants) {}
+
+record RequestPatchSession(String action) {}
+
+record ResponseDeleteSession(String status) {}
 
 

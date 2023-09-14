@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -302,6 +303,40 @@ class SessionControllerTest {
         ;
 
         verify(sessionService, times(1)).getSessionById(eq(99L));
+    }
+
+    /**
+     * Given request is valid, when invoke DELETE /api/v1/sessions/{sessionId}, return success status
+     * @throws Exception exception
+     */
+    @Test
+    void givenRequestIsValid_whenDeleteSession_returnSuccessStatus() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/sessions/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].status", is("Success")));
+
+        verify(sessionService, times(1)).deleteSession(2L);
+    }
+
+    /**
+     * Given path session ID is zero, when invoke POST /api/v1/sessions/{sessionId}, fail and throw error
+     * @throws Exception exception
+     */
+    @Test
+    void givenSessionIdIsZero_whenDeleteSession_returnError() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/sessions/0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.error", is("Bad Request")))
+                .andExpect(jsonPath("$.message", is("Session ID is mandatory")))
+                .andExpect(jsonPath("$.path", is("/api/v1/sessions/0")));
+
+        verifyNoInteractions(sessionService);
     }
 
 }

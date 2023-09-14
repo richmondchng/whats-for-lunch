@@ -144,7 +144,23 @@ public class SessionService {
      */
     public Session getSessionById(final long id) {
         final SessionEntity session = sessionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_UNABLE_TO_FIND_SESSION));
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
         return mapToBean(session);
+    }
+
+    /**
+     * Delete session
+     * @param id session ID
+     */
+    public void deleteSession(final long id) {
+        // get session
+        final SessionEntity session = sessionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+
+        // flag session
+        session.setStatus(SessionStatus.DELETED);
+
+        // save
+        sessionRepository.saveAndFlush(session);
     }
 }

@@ -16,7 +16,6 @@ public final class ApplicationMessages {
 
     public static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";
     public static final String ERROR_PARTICIPANT_NOT_FOUND = "Participant is not found";
-    public static final String ERROR_UNABLE_TO_FIND_SESSION = "Session not found";
     public static final String ERROR_SESSION_ID_INVALID = "Session ID is invalid";
     public static final String ERROR_SESSION_NOT_OPENED = "Session is not active";
     public static final String ERROR_USER_NOT_PARTICIPANT = "User is not a participant";

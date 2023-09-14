@@ -88,7 +88,7 @@ class RestaurantControllerTest {
     }
 
     /**
-     * Given request is valid, when invoke POST /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, return success status
+     * Given request is valid, when invoke DELETE /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, return success status
      * @throws Exception exception
      */
     @Test
@@ -104,7 +104,7 @@ class RestaurantControllerTest {
     }
 
     /**
-     * Given path session ID is zero, when invoke POST /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, fail and throw error
+     * Given path session ID is zero, when invoke DELETE /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, fail and throw error
      * @throws Exception exception
      */
     @Test
@@ -122,7 +122,7 @@ class RestaurantControllerTest {
     }
 
     /**
-     * Given path restaurant ID is zero, when invoke POST /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, fail and throw error
+     * Given path restaurant ID is zero, when invoke DELETE /api/v1/sessions/{sessionId}/restaurants/{restaurantId}, fail and throw error
      * @throws Exception exception
      */
     @Test

@@ -36,12 +36,6 @@ public class RestaurantService {
                 || (StringUtils.isNotBlank(description) && description.length() < 255), ApplicationMessages.ERROR_DESCRIPTION_OVER_MAX);
 
         // find session
-//        final SessionEntity session = sessionRepository.findById(sessionId)
-//                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
-//        if(SessionStatus.ACTIVE != session.getStatus()) {
-//            // session is not opened
-//            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
-//        }
         final SessionEntity session = getActiveSession(sessionId);
 
         // find user in participants

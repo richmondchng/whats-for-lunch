@@ -11,7 +11,7 @@ public final class ApplicationMessages {
     public static final String ERROR_USER_ID_MANDATORY = "User ID is mandatory";
     public static final String ERROR_RESTAURANT_MANDATORY = "Restaurant is mandatory";
     public static final String ERROR_RESTAURANT_ID_MANDATORY = "Restaurant ID is mandatory";
-    public static final String ERROR_PARTICIPANT_ID_MANDATORY = "Participant Id is mandatory";
+    public static final String ERROR_PARTICIPANT_ID_MANDATORY = "Participant ID is mandatory";
     public static final String SUCCESS_MESSAGE = "Success";
 
     public static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";
@@ -24,6 +24,7 @@ public final class ApplicationMessages {
     public static final String ERROR_DESCRIPTION_OVER_MAX = "Description is too long (max 255 character)";
 
     public static final String ERROR_RESTAURANT_NOT_IN_SESSION = "Restaurant is not session";
+    public static final String ERROR_PARTICIPANT_NOT_IN_SESSION = "Participant is not session";
 
     private ApplicationMessages() {}
 }

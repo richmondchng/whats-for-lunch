@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,7 +47,7 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$.timestamp", notNullValue()))
                 .andExpect(jsonPath("$.status", is(400)))
                 .andExpect(jsonPath("$.error", is("Bad Request")))
-                .andExpect(jsonPath("$.message", is("Participant Id is mandatory")))
+                .andExpect(jsonPath("$.message", is("Participant ID is mandatory")))
                 .andExpect(jsonPath("$.path", is("/api/v1/sessions/2/participants")));
 
         verifyNoInteractions(participantService);
@@ -87,5 +88,60 @@ class ParticipantControllerTest {
                 .andExpect(jsonPath("$.data[0].status", is("Success")));
 
         verify(participantService, times(1)).addParticipantsToSession(eq(2L), eq(List.of(6L, 7L)));
+    }
+
+
+
+
+    /**
+     * Given request is valid, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, return success status
+     * @throws Exception exception
+     */
+    @Test
+    void givenRequestBodyIsValid_whenDeleteParticipant_returnSuccessStatus() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/sessions/2/participants/5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].status", is("Success")));
+
+        verify(participantService, times(1)).deleteParticipantFromSession(2L, 5L);
+    }
+
+    /**
+     * Given path session ID is zero, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
+     * @throws Exception exception
+     */
+    @Test
+    void givenSessionIdIsZero_whenDeleteParticipant_returnError() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/sessions/0/participants/5"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.error", is("Bad Request")))
+                .andExpect(jsonPath("$.message", is("Session ID is mandatory")))
+                .andExpect(jsonPath("$.path", is("/api/v1/sessions/0/participants/5")));
+
+        verifyNoInteractions(participantService);
+    }
+
+    /**
+     * Given path restaurant ID is zero, when invoke POST /api/v1/sessions/{sessionId}/participants/{participantId}, fail and throw error
+     * @throws Exception exception
+     */
+    @Test
+    void givenParticipantIdIsZero_whenDeleteParticipant_returnError() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/sessions/2/participants/0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.error", is("Bad Request")))
+                .andExpect(jsonPath("$.message", is("Participant ID is mandatory")))
+                .andExpect(jsonPath("$.path", is("/api/v1/sessions/2/participants/0")));
+
+        verifyNoInteractions(participantService);
     }
 }

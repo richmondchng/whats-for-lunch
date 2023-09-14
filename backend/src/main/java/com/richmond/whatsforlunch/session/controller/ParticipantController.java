@@ -8,6 +8,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,8 +42,26 @@ public class ParticipantController {
         participantService.addParticipantsToSession(sessionId, body.participants());
         return ResponseEntity.ok(new StandardResponse<>(new ResponseAddParticipants(ApplicationMessages.SUCCESS_MESSAGE)));
     }
+
+    /**
+     * Delete a participant from session
+     * @param sessionId session ID
+     * @param participantId participant ID
+     * @return action status
+     */
+    @DeleteMapping(value = "/{participantId}")
+    public ResponseEntity<StandardResponse<ResponseDeleteParticipants>> deleteRestaurant(@PathVariable final long sessionId,
+                                                                                         @PathVariable final long participantId) {
+        Assert.isTrue(sessionId > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
+        Assert.isTrue(participantId > 0, ApplicationMessages.ERROR_PARTICIPANT_ID_MANDATORY);
+
+        participantService.deleteParticipantFromSession(sessionId, participantId);
+        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteParticipants(ApplicationMessages.SUCCESS_MESSAGE)));
+    }
 }
 
 record RequestAddParticipants(List<Long> participants) {}
 
 record ResponseAddParticipants(String status) {}
+
+record ResponseDeleteParticipants(String status) {}

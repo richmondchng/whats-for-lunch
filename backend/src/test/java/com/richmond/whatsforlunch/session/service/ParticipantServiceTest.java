@@ -26,6 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,6 +75,7 @@ class ParticipantServiceTest {
 
         // then
         verify(sessionRepository, times(1)).findById(eq(999L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
     }
 
     /**
@@ -95,11 +97,12 @@ class ParticipantServiceTest {
             participantService.addParticipantsToSession(15L, List.of(6L, 7L));
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
-            assertEquals("Session is active", e.getMessage());
+            assertEquals("Session is not active", e.getMessage());
         }
 
         // then
         verify(sessionRepository, times(1)).findById(eq(15L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
     }
 
     /**
@@ -158,5 +161,115 @@ class ParticipantServiceTest {
 
         // only 2 participants since only 2 are valid User ID.
         assertFalse(itr.hasNext());
+    }
+
+    /**
+     * Given session does not exist, when deleteParticipantToSession, throw exception
+     */
+    @Test
+    void givenSessionDoesNotExists_whenDeleteParticipantFromSession_throwException() {
+        // given
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when
+        try {
+            participantService.deleteParticipantFromSession(999L, 6L);
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Session ID is invalid", e.getMessage());
+        }
+
+        // then
+        verify(sessionRepository, times(1)).findById(eq(999L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given session is not active, when deleteParticipantToSession, throw exception
+     */
+    @Test
+    void givenSessionIsNotActive_whenDeleteParticipantFromSession_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.CLOSED)
+                .build();
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        try {
+            participantService.deleteParticipantFromSession(15L, 6L);
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Session is not active", e.getMessage());
+        }
+
+        // then
+        verify(sessionRepository, times(1)).findById(eq(15L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given participant is not in session, when deleteParticipantToSession, throw exception
+     */
+    @Test
+    void givenSessionListOfParticipants_whenDeleteParticipantFromSession_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .participants(new ArrayList<>())
+                .build();
+        session.getParticipants().add(ParticipantEntity.builder()
+                .id(new ParticipantId(15L, 2L)).user(owner).session(session)
+                .status(ParticipantStatus.PENDING).build());
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        try {
+            participantService.deleteParticipantFromSession(15L, 3L);
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Participant is not session", e.getMessage());
+        }
+
+        // then
+        verify(sessionRepository, times(1)).findById(eq(15L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given valid parameters, when deleteParticipantToSession, delete participant from session
+     */
+    @Test
+    void givenSessionListOfParticipants_whenDeleteParticipantFromSession_flagParticipantsAsDeleted() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .participants(new ArrayList<>())
+                .build();
+        session.getParticipants().add(ParticipantEntity.builder()
+                .id(new ParticipantId(15L, 2L)).user(owner).session(session)
+                .status(ParticipantStatus.PENDING).build());
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        participantService.deleteParticipantFromSession(15L, 2L);
+
+        // then
+        verify(sessionRepository, times(1)).findById(eq(15L));
+        final ArgumentCaptor<SessionEntity> captor = ArgumentCaptor.forClass(SessionEntity.class);
+        verify(sessionRepository, times(1)).saveAndFlush(captor.capture());
+        final SessionEntity result = captor.getValue();
+        assertEquals(1, session.getParticipants().size());
+        assertEquals(2L, session.getParticipants().get(0).getId().getUserId());
+        assertEquals(ParticipantStatus.DELETED, session.getParticipants().get(0).getStatus());
     }
 }

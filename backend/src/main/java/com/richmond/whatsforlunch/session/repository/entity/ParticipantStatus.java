@@ -17,6 +17,10 @@ public enum ParticipantStatus {
      */
     JOINED,
     /**
+     * Deleted
+     */
+    DELETED,
+    /**
      * Exit session
      */
     EXIT;

@@ -35,12 +35,7 @@ public class ParticipantService {
      */
     public void addParticipantsToSession(final long sessionId, final List<Long> participants) {
         // get session
-        final SessionEntity session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
-        if(SessionStatus.ACTIVE != session.getStatus()) {
-            // session is not opened
-            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
-        }
+        final SessionEntity session = getActiveSession(sessionId);
 
         // if participant is not already in session, add
         final Set<Long> alreadyInSession = session.getParticipants().stream()
@@ -60,5 +55,36 @@ public class ParticipantService {
         }
         // save
         sessionRepository.saveAndFlush(session);
+    }
+
+    /**
+     * Delete participant from session
+     * @param sessionId session ID
+     * @param participantId participant ID
+     */
+    public void deleteParticipantFromSession(final long sessionId, final long participantId) {
+        // get session
+        final SessionEntity session = getActiveSession(sessionId);
+
+        // determine if participant in session
+        final ParticipantEntity participant = session.getParticipants().stream()
+                .filter(p -> p.getId().getUserId() == participantId).findAny()
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_PARTICIPANT_NOT_IN_SESSION));
+
+        // flag participant as deleted
+        participant.setStatus(ParticipantStatus.DELETED);
+
+        // save
+        sessionRepository.saveAndFlush(session);
+    }
+
+    private SessionEntity getActiveSession(final long sessionId) {
+        final SessionEntity session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+        if(SessionStatus.ACTIVE != session.getStatus()) {
+            // session is not opened
+            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
+        }
+        return session;
     }
 }

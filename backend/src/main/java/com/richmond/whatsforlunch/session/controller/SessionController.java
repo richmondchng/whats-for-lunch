@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,10 @@ public class SessionController {
 
     private final SessionService sessionService;
 
+    private static final String ERROR_SESSION_ID_MANDATORY = "Session ID is mandatory";
+    private static final String ERROR_SESSION_DATE_MANDATORY = "Date is mandatory";
+    private static final String ERROR_SESSION_OWNER_ID_MANDATORY = "Owner Id is mandatory";
+
     /**
      * POST action to create a new session
      * @return newly create session
@@ -38,13 +43,14 @@ public class SessionController {
     public ResponseEntity<StandardResponse<ResponseSession>> createNewSession(
             @RequestBody final RequestCreateNewSession request) {
 
-        Assert.notNull(request.date(), "Date is mandatory");
-        Assert.isTrue(request.owner() > 0, "Owner Id is mandatory");
+        Assert.notNull(request.date(), ERROR_SESSION_DATE_MANDATORY);
+        Assert.isTrue(request.owner() > 0, ERROR_SESSION_OWNER_ID_MANDATORY);
 
         final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
         // return created session
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
+
 
     /**
      * Get sessions.
@@ -68,6 +74,18 @@ public class SessionController {
             results = new ArrayList<>(0);
         }
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(results)));
+    }
+
+    /**
+     * Get session by ID.
+     * @param id session ID
+     * @return list of sessions
+     */
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StandardResponse<ResponseSession>> getSessionById(@PathVariable final long id) {
+        Assert.isTrue(id > 0, ERROR_SESSION_ID_MANDATORY);
+        final Session session = sessionService.getSessionById(id);
+        return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
 }
 

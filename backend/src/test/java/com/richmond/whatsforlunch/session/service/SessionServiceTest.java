@@ -2,10 +2,13 @@ package com.richmond.whatsforlunch.session.service;
 
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
+import com.richmond.whatsforlunch.session.repository.entity.ParticipantId;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantStatus;
+import com.richmond.whatsforlunch.session.repository.entity.RestaurantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.dto.Participant;
+import com.richmond.whatsforlunch.session.service.dto.Restaurant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import com.richmond.whatsforlunch.users.repository.UserRepository;
 import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
@@ -19,10 +22,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,6 +59,9 @@ class SessionServiceTest {
 
     // test instance
     private SessionService sessionService;
+
+    @Captor
+    private ArgumentCaptor<Set<SessionStatus>> setStatusCaptor;
 
     @BeforeEach
     void setUp() {
@@ -176,9 +184,6 @@ class SessionServiceTest {
         assertFalse(itrE.hasNext());
     }
 
-    @Captor
-    private ArgumentCaptor<Set<SessionStatus>> setStatusCaptor;
-
     /**
      * Given owner ID, when get sessions by owner, return sessions
      */
@@ -238,4 +243,74 @@ class SessionServiceTest {
         assertTrue(paramStatus.contains(SessionStatus.OPEN));
     }
 
+    /**
+     * Given session ID is invalid, when getSessionById, throw exception when repository return empty
+     */
+    @Test
+    void givenInvalidSessionId_whenGetSessionById_throwException() {
+        // given
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when
+        try {
+            sessionService.getSessionById(999L);
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Session not found", e.getMessage());
+        }
+
+        // then
+        verify(sessionRepository).findById(999L);
+    }
+
+    /**
+     * Given session ID, when getSessionById, return session object
+     */
+    @Test
+    void givenSessionId_whenGetSessionById_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").lastName("Goh").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(99L).date(LocalDate.of(2023, 9, 12))
+                .owner(owner)
+                .participants(new ArrayList<>(1))
+                .restaurants(new ArrayList<>(1))
+                .status(SessionStatus.OPEN)
+                .build();
+        session.getParticipants().add(ParticipantEntity.builder()
+                .id(new ParticipantId(3L, 2L)).session(session).user(owner)
+                .status(ParticipantStatus.PENDING).build());
+        session.getRestaurants().add(RestaurantEntity.builder()
+                .id(20L).addedByUser(2L).restaurantName("McFried Chicken").description("Yummy fried chicken").build());
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        final Session result = sessionService.getSessionById(99L);
+
+        // then
+        verify(sessionRepository, times(1)).findById(eq(99L));
+
+        // test result is mapped correctly
+        assertEquals(99L, result.id());
+        assertEquals("OPEN", result.status());
+        assertEquals(LocalDate.of(2023, 9, 12), result.date());
+
+        assertEquals(2L, result.owner().id());
+        assertEquals("ed", result.owner().userName());
+        assertEquals("Edward", result.owner().displayName());
+
+        assertEquals(1, result.participants().size());
+        final Participant participant = result.participants().get(0);
+        assertEquals(2L, participant.id());
+        assertEquals("ed", participant.userName());
+        assertEquals("Edward", participant.displayName());
+        assertEquals("PENDING", participant.status());
+
+        assertEquals(1, result.restaurants().size());
+        final Restaurant restaurant = result.restaurants().get(0);
+        assertEquals(20L, restaurant.id());
+        assertEquals(2L, restaurant.userId());
+        assertEquals("McFried Chicken", restaurant.restaurant());
+        assertEquals("Yummy fried chicken", restaurant.description());
+    }
 }

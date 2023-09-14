@@ -4,6 +4,7 @@ import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.SessionService;
 import com.richmond.whatsforlunch.session.service.dto.Owner;
 import com.richmond.whatsforlunch.session.service.dto.Participant;
+import com.richmond.whatsforlunch.session.service.dto.Restaurant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -236,5 +237,70 @@ class SessionControllerTest {
         verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("CLOSED", "DELETED"));
     }
 
+
+    /**
+     * Given path variable session ID is 0, when invoke GET /api/v1/sessions/{id}, throw error
+     * @throws Exception exception
+     */
+    @Test
+    void givenSessionIdZero_whenGetSessionById_returnError() throws Exception {
+
+        mockMvc.perform(get("/api/v1/sessions/0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.error", is("Bad Request")))
+                .andExpect(jsonPath("$.message", is("Session ID is mandatory")))
+                .andExpect(jsonPath("$.path", is("/api/v1/sessions/0")));
+
+        verifyNoInteractions(sessionService);
+    }
+
+    /**
+     * Given path variable session ID is 0, when invoke GET /api/v1/sessions/{id}, throw error
+     * @throws Exception exception
+     */
+    @Test
+    void givenSessionId_whenGetSessionById_returnSessionDetails() throws Exception {
+
+        final Owner owner = new Owner(2L, "ed", "Edward");
+        final Participant participant1 = new Participant(2L, "ed", "Edward", "PENDING");
+        final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food");
+        final Session session = new Session(99L, LocalDate.of(2023, 9, 12),
+                owner, List.of(participant1), List.of(restaurant1), SessionStatus.OPEN.getName(), 1);
+        when(sessionService.getSessionById(anyLong())).thenReturn(session);
+
+        mockMvc.perform(get("/api/v1/sessions/99"))
+                .andExpect(status().isOk())
+
+                // test data is mapped correctly
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id", is(99)))
+                .andExpect(jsonPath("$.data[0].date", is("2023-09-12")))
+                .andExpect(jsonPath("$.data[0].owner.id", is(2)))
+                .andExpect(jsonPath("$.data[0].owner.userName", is("ed")))
+                .andExpect(jsonPath("$.data[0].owner.displayName", is("Edward")))
+
+                .andExpect(jsonPath("$.data[0].participants").isArray())
+                .andExpect(jsonPath("$.data[0].participants", hasSize(1)))
+
+                .andExpect(jsonPath("$.data[0].participants[0].id", is(2)))
+                .andExpect(jsonPath("$.data[0].participants[0].userName", is("ed")))
+                .andExpect(jsonPath("$.data[0].participants[0].displayName", is("Edward")))
+                .andExpect(jsonPath("$.data[0].participants[0].status", is("PENDING")))
+
+                .andExpect(jsonPath("$.data[0].restaurants").isArray())
+                .andExpect(jsonPath("$.data[0].restaurants", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].restaurants[0].id", is(5)))
+                .andExpect(jsonPath("$.data[0].restaurants[0].addedBy", is(2)))
+                .andExpect(jsonPath("$.data[0].restaurants[0].restaurantName", is("Brian's Eatery")))
+                .andExpect(jsonPath("$.data[0].restaurants[0].description", is("Fusion food")))
+
+                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
+        ;
+
+        verify(sessionService, times(1)).getSessionById(eq(99L));
+    }
 
 }

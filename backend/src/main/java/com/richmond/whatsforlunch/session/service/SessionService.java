@@ -40,6 +40,10 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
 
+    private static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";
+    private static final String ERROR_PARTICIPANT_NOT_FOUND = "Participant is not found";
+    private static final String ERROR_UNABLE_TO_FIND_SESSION = "Session not found";
+
     /**
      * Create new session.
      * @param date for date
@@ -59,7 +63,7 @@ public class SessionService {
         final UserEntity owner = userMap.get(ownerId);
         if(owner == null) {
             // owner ID is not valid
-            throw new UserNotFoundException("Owner is not found");
+            throw new UserNotFoundException(ERROR_OWNER_NOT_FOUND);
         }
 
         // create a new session
@@ -75,7 +79,7 @@ public class SessionService {
             if(participant == null) {
                 // participant ID is not valid
                 log.error("Unable to find User with Id " + participantId);
-                throw new UserNotFoundException("Participant is not found");
+                throw new UserNotFoundException(ERROR_PARTICIPANT_NOT_FOUND);
             }
             // add to session
             session.getParticipants().add(ParticipantEntity.builder()
@@ -133,5 +137,16 @@ public class SessionService {
     private Set<SessionStatus> getStatusObject(final List<String> status) {
         return status.stream().map(s -> SessionStatus.find(s)).filter(s -> s != null)
                 .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * Get session by ID.
+     * @param id session ID
+     * @return session
+     */
+    public Session getSessionById(final long id) {
+        final SessionEntity session = sessionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_UNABLE_TO_FIND_SESSION));
+        return mapToBean(session);
     }
 }

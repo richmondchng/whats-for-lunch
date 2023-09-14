@@ -23,8 +23,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StandardResponse<User>> getUsers() {
-        return ResponseEntity.ok(new StandardResponse<>(List.copyOf(userService.getAllUsers())));
+    public ResponseEntity<StandardResponse<ResponseUser>> getUsers() {
+        return ResponseEntity.ok(new StandardResponse<>(mapToBeans(userService.getAllUsers())));
+    }
+
+    private List<ResponseUser> mapToBeans(final List<User> beans) {
+        return beans.stream().map(this::mapToBean).toList();
+    }
+    private ResponseUser mapToBean(final User bean) {
+        return new ResponseUser(bean.id(), bean.userName(), bean.firstName(), bean.lastName());
     }
 }
+
+record ResponseUser (long id, String userName, String firstName, String lastName) { }
 

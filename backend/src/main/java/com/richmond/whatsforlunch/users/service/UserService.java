@@ -6,7 +6,7 @@ import com.richmond.whatsforlunch.users.service.dto.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +22,7 @@ public class UserService {
      * Get all users.
      * @return collection of users, or empty collection
      */
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll()
                 .stream().map(this::mapToBean)
                 .collect(Collectors.toUnmodifiableList());

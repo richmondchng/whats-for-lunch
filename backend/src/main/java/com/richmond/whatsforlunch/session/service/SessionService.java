@@ -42,8 +42,6 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
 
-
-
     /**
      * Create new session.
      * @param date for date

@@ -8,9 +8,9 @@ import java.util.Optional;
  */
 public enum SessionStatus {
     /**
-     * Open session
+     * Active open session
      */
-    OPEN,
+    ACTIVE,
     /**
      * Closed session
      */

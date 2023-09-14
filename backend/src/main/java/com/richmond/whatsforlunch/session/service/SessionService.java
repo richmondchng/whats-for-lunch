@@ -68,7 +68,7 @@ public class SessionService {
 
         // create a new session
         final SessionEntity session = SessionEntity.builder()
-                .date(date).owner(owner).status(SessionStatus.OPEN)
+                .date(date).owner(owner).status(SessionStatus.ACTIVE)
                 .participants(new ArrayList<>(participantIds.size()))
                 .restaurants(Collections.emptyList())
                 .build();

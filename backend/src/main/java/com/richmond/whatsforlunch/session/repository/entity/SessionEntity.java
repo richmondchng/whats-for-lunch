@@ -51,7 +51,7 @@ public class SessionEntity {
     private List<RestaurantEntity> restaurants;
 
     @Enumerated(EnumType.STRING)
-    private SessionStatus status = SessionStatus.OPEN;
+    private SessionStatus status = SessionStatus.ACTIVE;
 
     @Version
     private long version;

@@ -139,9 +139,8 @@ class SessionServiceTest {
 
         // then
         assertEquals(998L, result.id());
-        assertEquals("OPEN", result.status());
         assertEquals(LocalDate.of(2023, 9, 13), result.date());
-        assertEquals("OPEN", result.status());
+        assertEquals("ACTIVE", result.status());
         assertEquals(2L, result.owner().id());
         assertEquals("ed", result.owner().userName());
         assertEquals("Edward", result.owner().displayName());
@@ -170,7 +169,7 @@ class SessionServiceTest {
         final SessionEntity saved = argumentCaptor.getValue();
         assertEquals(LocalDate.of(2023, 9, 13), saved.getDate());
         assertEquals(2L, saved.getOwner().getId());
-        assertEquals(SessionStatus.OPEN, saved.getStatus());
+        assertEquals(SessionStatus.ACTIVE, saved.getStatus());
 
         final Iterator<ParticipantEntity> itrE = saved.getParticipants().stream()
                 .sorted(Comparator.comparing(p -> p.getUser().getId())).toList().iterator();
@@ -197,12 +196,12 @@ class SessionServiceTest {
                         .owner(UserEntity.builder().id(2L).build())
                         .participants(Collections.emptyList())
                         .restaurants(Collections.emptyList())
-                        .status(SessionStatus.OPEN)
+                        .status(SessionStatus.ACTIVE)
                         .build())
         );
 
         // when
-        final List<Session> results = sessionService.getSessionsByOwner(2L, List.of("OPEN", "CLOSED", "COMPLETED"));
+        final List<Session> results = sessionService.getSessionsByOwner(2L, List.of("ACTIVE", "CLOSED", "COMPLETED"));
 
         // then
         assertEquals(1, results.size());
@@ -211,7 +210,7 @@ class SessionServiceTest {
         verify(sessionRepository, times(1)).findByOwnerAndStatus(eq(2L), setStatusCaptor.capture());
         final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
         assertEquals(2, paramStatus.size());
-        assertTrue(paramStatus.contains(SessionStatus.OPEN));
+        assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
         assertTrue(paramStatus.contains(SessionStatus.CLOSED));
     }
 
@@ -227,12 +226,12 @@ class SessionServiceTest {
                         .owner(UserEntity.builder().id(2L).build())
                         .participants(Collections.emptyList())
                         .restaurants(Collections.emptyList())
-                        .status(SessionStatus.OPEN)
+                        .status(SessionStatus.ACTIVE)
                         .build())
         );
 
         // when
-        final List<Session> results = sessionService.getSessionsByParticipant(2L, List.of("OPEN"));
+        final List<Session> results = sessionService.getSessionsByParticipant(2L, List.of("ACTIVE"));
 
         // then
         assertEquals(1, results.size());
@@ -241,7 +240,7 @@ class SessionServiceTest {
         verify(sessionRepository, times(1)).findByParticipantAndStatus(eq(2L), setStatusCaptor.capture());
         final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
         assertEquals(1, paramStatus.size());
-        assertTrue(paramStatus.contains(SessionStatus.OPEN));
+        assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
     }
 
     /**
@@ -276,7 +275,7 @@ class SessionServiceTest {
                 .owner(owner)
                 .participants(new ArrayList<>(1))
                 .restaurants(new ArrayList<>(1))
-                .status(SessionStatus.OPEN)
+                .status(SessionStatus.ACTIVE)
                 .build();
         session.getParticipants().add(ParticipantEntity.builder()
                 .id(new ParticipantId(3L, 2L)).session(session).user(owner)
@@ -294,7 +293,7 @@ class SessionServiceTest {
 
         // test result is mapped correctly
         assertEquals(99L, result.id());
-        assertEquals("OPEN", result.status());
+        assertEquals("ACTIVE", result.status());
         assertEquals(LocalDate.of(2023, 9, 12), result.date());
 
         assertEquals(2L, result.owner().id());

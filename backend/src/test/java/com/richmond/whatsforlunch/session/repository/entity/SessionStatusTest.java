@@ -15,8 +15,8 @@ class SessionStatusTest {
      */
     @Test
     void givenNameIsValid_whenFind_returnObject() {
-        final SessionStatus result = SessionStatus.find("OPEN");
-        assertEquals(SessionStatus.OPEN, result);
+        final SessionStatus result = SessionStatus.find("ACTIVE");
+        assertEquals(SessionStatus.ACTIVE, result);
     }
 
     /**

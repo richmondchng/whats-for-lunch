@@ -21,17 +21,17 @@ FROM users u
 WHERE u.user_name = 'john';
 
 INSERT INTO sessions (session_date, owner_id, status, version) 
-SELECT '2023-09-07', u.ID, 'OPEN', 0
+SELECT '2023-09-07', u.ID, 'ACTIVE', 0
 FROM users u
 WHERE u.user_name = 'pam';
 
 INSERT INTO sessions (session_date, owner_id, status, version) 
-SELECT '2023-09-07', u.ID, 'OPEN', 0
+SELECT '2023-09-07', u.ID, 'ACTIVE', 0
 FROM users u
 WHERE u.user_name = 'natasha';
 
 INSERT INTO sessions (session_date, owner_id, status, version) 
-SELECT '2023-09-07', u.ID, 'OPEN', 0
+SELECT '2023-09-07', u.ID, 'ACTIVE', 0
 FROM users u
 WHERE u.user_name = 'john';
 

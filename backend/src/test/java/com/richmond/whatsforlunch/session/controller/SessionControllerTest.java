@@ -66,7 +66,7 @@ class SessionControllerTest {
                   new Owner(2L, "ed", "Edward"),
                   List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                           new Participant(5L, "peggy", "Peggy", "PENDING")),
-                  Collections.emptyList(), SessionStatus.OPEN.getName(), 1)
+                  Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1)
         );
 
         final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
@@ -95,7 +95,7 @@ class SessionControllerTest {
 
                 .andExpect(jsonPath("$.data[0].restaurants").isArray())
                 .andExpect(jsonPath("$.data[0].restaurants", hasSize(0)))
-                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
+                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.ACTIVE.getName())))
         ;
 
         verify(sessionService, times(1)).createNewSession(
@@ -174,7 +174,7 @@ class SessionControllerTest {
                             new Owner(2L, "ed", "Edward"),
                             List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                            Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
+                            Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?owner=2"))
@@ -184,7 +184,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].id", is(99)))
                 .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
 
-        verify(sessionService, times(1)).getSessionsByOwner(2L, List.of("OPEN","CLOSED"));
+        verify(sessionService, times(1)).getSessionsByOwner(2L, List.of("ACTIVE","CLOSED"));
     }
 
     /**
@@ -199,7 +199,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
+                                Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5"))
@@ -209,7 +209,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].id", is(99)))
                 .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
 
-        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("OPEN","CLOSED"));
+        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("ACTIVE","CLOSED"));
     }
 
     /**
@@ -224,7 +224,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
+                                Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5&status=CLOSED,DELETED"))
@@ -267,7 +267,7 @@ class SessionControllerTest {
         final Participant participant1 = new Participant(2L, "ed", "Edward", "PENDING");
         final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
         final Session session = new Session(99L, LocalDate.of(2023, 9, 12),
-                owner, List.of(participant1), List.of(restaurant1), SessionStatus.OPEN.getName(), 1);
+                owner, List.of(participant1), List.of(restaurant1), SessionStatus.ACTIVE.getName(), 1);
         when(sessionService.getSessionById(anyLong())).thenReturn(session);
 
         mockMvc.perform(get("/api/v1/sessions/99"))
@@ -298,7 +298,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurants[0].description", is("Fusion food")))
                 .andExpect(jsonPath("$.data[0].restaurants[0].status", is("ACTIVE")))
 
-                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
+                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.ACTIVE.getName())))
         ;
 
         verify(sessionService, times(1)).getSessionById(eq(99L));

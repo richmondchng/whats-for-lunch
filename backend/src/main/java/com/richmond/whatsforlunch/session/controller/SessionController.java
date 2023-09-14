@@ -61,7 +61,7 @@ public class SessionController {
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> getSessions(
-            @RequestParam(defaultValue = "OPEN,CLOSED") final List<String> status,
+            @RequestParam(defaultValue = "ACTIVE,CLOSED") final List<String> status,
             @RequestParam(required = false) final Long owner,
             @RequestParam(required = false) final Long participant) {
 

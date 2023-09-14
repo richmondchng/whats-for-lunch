@@ -43,7 +43,7 @@ public class RestaurantService {
         // find session
         final SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_SESSION_ID_INVALID));
-        if(SessionStatus.OPEN != session.getStatus()) {
+        if(SessionStatus.ACTIVE != session.getStatus()) {
             // session is not opened
             throw new IllegalArgumentException(ERROR_SESSION_NOT_OPENED);
         }

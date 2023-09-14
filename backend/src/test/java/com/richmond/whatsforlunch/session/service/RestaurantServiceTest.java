@@ -107,7 +107,7 @@ class RestaurantServiceTest {
 
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.OPEN)
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.CLOSED)
                 .build();
@@ -137,7 +137,7 @@ class RestaurantServiceTest {
         final ParticipantEntity participant2 = ParticipantEntity.builder().id(new ParticipantId(15L, 3L)).user(participantUser1).build();
 
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.OPEN)
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
                 .version(0).owner(owner).participants(List.of(participant1, participant2))
                 .build();
         // given

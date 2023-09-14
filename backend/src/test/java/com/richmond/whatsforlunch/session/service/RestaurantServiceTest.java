@@ -202,7 +202,7 @@ class RestaurantServiceTest {
 
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.CLOSED)
                 .build();
@@ -232,7 +232,7 @@ class RestaurantServiceTest {
         final RestaurantEntity restaurant = RestaurantEntity.builder().id(5L).addedByUser(2L)
                 .restaurantName("McDipsy Hut").description("Very nice ice cream").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .restaurants(new ArrayList<>())
@@ -264,7 +264,7 @@ class RestaurantServiceTest {
         final RestaurantEntity restaurant = RestaurantEntity.builder().id(5L).addedByUser(2L)
                 .restaurantName("McDipsy Hut").description("Very nice ice cream").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .restaurants(new ArrayList<>())

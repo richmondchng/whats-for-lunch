@@ -40,7 +40,8 @@ public class RestaurantEntity {
     private long addedByUser;
 
     @Enumerated(EnumType.STRING)
-    private RestaurantStatus status;
+    @Builder.Default
+    private RestaurantStatus status = RestaurantStatus.ACTIVE;
 
     @Version
     private long version;

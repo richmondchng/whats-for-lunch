@@ -32,7 +32,7 @@ public final class ResponseSessionUtil {
                 mapToBean(session.owner()),
                 session.participants().stream().map(ResponseSessionUtil::mapToBean).toList(),
                 session.restaurants().stream().map(ResponseSessionUtil::mapToBean).toList(),
-                session.status());
+                session.selectedRestaurant(), session.status());
     }
 
     private static ResponseSessionOwner mapToBean(final Owner bean) {

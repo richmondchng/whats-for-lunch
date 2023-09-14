@@ -12,6 +12,7 @@ public final class ApplicationMessages {
     public static final String ERROR_RESTAURANT_MANDATORY = "Restaurant is mandatory";
     public static final String ERROR_RESTAURANT_ID_MANDATORY = "Restaurant ID is mandatory";
     public static final String ERROR_PARTICIPANT_ID_MANDATORY = "Participant ID is mandatory";
+    public static final String ERROR_PATCH_SESSION_STATUS_MANDATORY = "Patch session status is mandatory";
     public static final String SUCCESS_MESSAGE = "Success";
 
     public static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";
@@ -24,6 +25,8 @@ public final class ApplicationMessages {
 
     public static final String ERROR_RESTAURANT_NOT_IN_SESSION = "Restaurant is not session";
     public static final String ERROR_PARTICIPANT_NOT_IN_SESSION = "Participant is not session";
+
+    public static final String ERROR_STRATEGY_NOT_FOUND = "Strategy is not found";
 
     private ApplicationMessages() {}
 }

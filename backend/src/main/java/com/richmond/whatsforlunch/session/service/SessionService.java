@@ -5,14 +5,11 @@ import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantId;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantStatus;
-import com.richmond.whatsforlunch.session.repository.entity.RestaurantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
-import com.richmond.whatsforlunch.session.service.dto.Owner;
-import com.richmond.whatsforlunch.session.service.dto.Participant;
-import com.richmond.whatsforlunch.session.service.dto.Restaurant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import com.richmond.whatsforlunch.session.util.ApplicationMessages;
+import com.richmond.whatsforlunch.session.util.ServiceBeanMapper;
 import com.richmond.whatsforlunch.users.repository.UserRepository;
 import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
 import jakarta.transaction.Transactional;
@@ -68,6 +65,7 @@ public class SessionService {
                 .date(date).owner(owner).status(SessionStatus.ACTIVE)
                 .participants(new ArrayList<>(participantIds.size()))
                 .restaurants(Collections.emptyList())
+                .selectedRestaurant(0L)
                 .build();
 
         // create participants
@@ -86,28 +84,7 @@ public class SessionService {
         }
         // save
         sessionRepository.saveAndFlush(session);
-        return mapToBean(session);
-    }
-
-
-    private Session mapToBean(final SessionEntity entity) {
-        return new Session(entity.getId(), entity.getDate(), mapToBean(entity.getOwner()),
-                entity.getParticipants().stream().map(this::mapToBean).toList(),
-                entity.getRestaurants().stream().map(this::mapToBean).toList(),
-                entity.getStatus().getName(), entity.getVersion());
-    }
-
-    private Owner mapToBean(final UserEntity entity) {
-        return new Owner(entity.getId(), entity.getUserName(), entity.getFirstName());
-    }
-    private Participant mapToBean(final ParticipantEntity entity) {
-        return new Participant(entity.getUser().getId(), entity.getUser().getUserName(), entity.getUser().getFirstName(),
-                entity.getStatus().getName());
-    }
-
-    private Restaurant mapToBean(final RestaurantEntity entity) {
-        return new Restaurant(entity.getId(), entity.getAddedByUser(), entity.getRestaurantName(),
-                entity.getDescription(), entity.getStatus().getName());
+        return ServiceBeanMapper.mapToBean(session);
     }
 
     /**
@@ -118,7 +95,7 @@ public class SessionService {
      */
     public List<Session> getSessionsByOwner(final long ownerId, final List<String> status) {
         return sessionRepository.findByOwnerAndStatus(ownerId, getStatusObject(status))
-                .stream().map(this::mapToBean).toList();
+                .stream().map(ServiceBeanMapper::mapToBean).toList();
     }
 
     /**
@@ -129,7 +106,7 @@ public class SessionService {
      */
     public List<Session> getSessionsByParticipant(final long participantId, final List<String> status) {
         return sessionRepository.findByParticipantAndStatus(participantId, getStatusObject(status))
-                .stream().map(this::mapToBean).toList();
+                .stream().map(ServiceBeanMapper::mapToBean).toList();
     }
 
     private Set<SessionStatus> getStatusObject(final List<String> status) {
@@ -145,7 +122,7 @@ public class SessionService {
     public Session getSessionById(final long id) {
         final SessionEntity session = sessionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
-        return mapToBean(session);
+        return ServiceBeanMapper.mapToBean(session);
     }
 
     /**
@@ -163,4 +140,6 @@ public class SessionService {
         // save
         sessionRepository.saveAndFlush(session);
     }
+
+
 }

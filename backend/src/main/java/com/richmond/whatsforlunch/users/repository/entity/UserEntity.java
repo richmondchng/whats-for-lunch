@@ -39,5 +39,6 @@ public class UserEntity {
     private String lastName;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "owner")
+    @Builder.Default
     private List<SessionEntity> sessions = new ArrayList<>();
 }

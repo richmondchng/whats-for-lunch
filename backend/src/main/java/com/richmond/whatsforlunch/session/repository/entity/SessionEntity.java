@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,13 +46,18 @@ public class SessionEntity {
     private UserEntity owner;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "session")
-    private List<ParticipantEntity> participants;
+    @Builder.Default
+    private List<ParticipantEntity> participants = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "session")
-    private List<RestaurantEntity> restaurants;
+    @Builder.Default
+    private List<RestaurantEntity> restaurants = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private SessionStatus status = SessionStatus.ACTIVE;
+
+    private long selectedRestaurant;
 
     @Version
     private long version;

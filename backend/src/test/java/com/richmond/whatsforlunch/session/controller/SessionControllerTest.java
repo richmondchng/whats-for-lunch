@@ -1,6 +1,7 @@
 package com.richmond.whatsforlunch.session.controller;
 
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
+import com.richmond.whatsforlunch.session.service.SelectionService;
 import com.richmond.whatsforlunch.session.service.SessionService;
 import com.richmond.whatsforlunch.session.service.dto.Owner;
 import com.richmond.whatsforlunch.session.service.dto.Participant;
@@ -29,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +54,8 @@ class SessionControllerTest {
 
     @MockBean
     private SessionService sessionService;
+    @MockBean
+    private SelectionService selectionService;
 
     @Captor
     private ArgumentCaptor<List<Long>> participantsCaptor;
@@ -67,7 +72,7 @@ class SessionControllerTest {
                   new Owner(2L, "ed", "Edward"),
                   List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                           new Participant(5L, "peggy", "Peggy", "PENDING")),
-                  Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1)
+                  Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1)
         );
 
         final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
@@ -97,6 +102,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurants").isArray())
                 .andExpect(jsonPath("$.data[0].restaurants", hasSize(0)))
                 .andExpect(jsonPath("$.data[0].status", is(SessionStatus.ACTIVE.getName())))
+                .andExpect(jsonPath("$.data[0].selectedRestaurant", is(0)))
         ;
 
         verify(sessionService, times(1)).createNewSession(
@@ -175,7 +181,7 @@ class SessionControllerTest {
                             new Owner(2L, "ed", "Edward"),
                             List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                            Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
+                            Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?owner=2"))
@@ -200,7 +206,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
+                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5"))
@@ -225,7 +231,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), SessionStatus.ACTIVE.getName(), 1))
+                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5&status=CLOSED,DELETED"))
@@ -268,7 +274,7 @@ class SessionControllerTest {
         final Participant participant1 = new Participant(2L, "ed", "Edward", "PENDING");
         final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
         final Session session = new Session(99L, LocalDate.of(2023, 9, 12),
-                owner, List.of(participant1), List.of(restaurant1), SessionStatus.ACTIVE.getName(), 1);
+                owner, List.of(participant1), List.of(restaurant1), 0L, SessionStatus.ACTIVE.getName(), 1);
         when(sessionService.getSessionById(anyLong())).thenReturn(session);
 
         mockMvc.perform(get("/api/v1/sessions/99"))
@@ -300,6 +306,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurants[0].status", is("ACTIVE")))
 
                 .andExpect(jsonPath("$.data[0].status", is(SessionStatus.ACTIVE.getName())))
+                .andExpect(jsonPath("$.data[0].selectedRestaurant", is(0)))
         ;
 
         verify(sessionService, times(1)).getSessionById(eq(99L));
@@ -339,4 +346,25 @@ class SessionControllerTest {
         verifyNoInteractions(sessionService);
     }
 
+    /**
+     * Given request, when invoke PATCH /api/v1/sessions/{id}, select restaurant and close session
+     * @throws Exception exception
+     */
+    @Test
+    void givenValidRequest_whenPatchSession_returnSessionDetails() throws Exception {
+
+        final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
+        when(selectionService.selectRestaurant(anyLong(), anyString())).thenReturn(restaurant1);
+
+        final String content = "{\"strategy\":\"RANDOM\"}";
+        mockMvc.perform(patch("/api/v1/sessions/99").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].sessionId", is(99)))
+                .andExpect(jsonPath("$.data[0].restaurantId", is(5)))
+                .andExpect(jsonPath("$.data[0].restaurantName", is("Brian's Eatery")));
+
+        verify(selectionService, times(1)).selectRestaurant(eq(99L), eq("RANDOM"));
+    }
 }

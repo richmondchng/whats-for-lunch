@@ -345,7 +345,7 @@ class SessionServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .build();

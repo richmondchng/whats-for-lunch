@@ -10,7 +10,9 @@ import java.util.List;
  * @param owner session owner
  * @param participants list of session participants
  * @param restaurants list of session restaurants
+ * @param selectedRestaurant selected restaurant ID
  * @param status current session status
  * @param version version
  */
-public record Session(long id, LocalDate date, Owner owner, List<Participant> participants, List<Restaurant> restaurants, String status, long version) { }
+public record Session(long id, LocalDate date, Owner owner, List<Participant> participants, List<Restaurant> restaurants,
+                      long selectedRestaurant, String status, long version) { }

@@ -15,7 +15,7 @@ import java.util.List;
 public record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner,
                               List<ResponseSessionParticipant> participants,
                               List<ResponseSessionRestaurant> restaurants,
-                              String status) {}
+                              long selectedRestaurant, String status) {}
 
 /**
  * Record describing session owner.

@@ -86,7 +86,7 @@ class ParticipantServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.CLOSED)
                 .build();
@@ -113,7 +113,7 @@ class ParticipantServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .participants(new ArrayList<>())
@@ -192,7 +192,7 @@ class ParticipantServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.CLOSED)
                 .build();
@@ -219,7 +219,7 @@ class ParticipantServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .participants(new ArrayList<>())
@@ -250,7 +250,7 @@ class ParticipantServiceTest {
         // given
         final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
         final SessionEntity session = SessionEntity.builder()
-                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .id(15L).date(LocalDate.of(2023, 9, 13))
                 // session is closed
                 .version(0).owner(owner).status(SessionStatus.ACTIVE)
                 .participants(new ArrayList<>())
@@ -268,8 +268,8 @@ class ParticipantServiceTest {
         final ArgumentCaptor<SessionEntity> captor = ArgumentCaptor.forClass(SessionEntity.class);
         verify(sessionRepository, times(1)).saveAndFlush(captor.capture());
         final SessionEntity result = captor.getValue();
-        assertEquals(1, session.getParticipants().size());
-        assertEquals(2L, session.getParticipants().get(0).getId().getUserId());
-        assertEquals(ParticipantStatus.DELETED, session.getParticipants().get(0).getStatus());
+        assertEquals(1, result.getParticipants().size());
+        assertEquals(2L, result.getParticipants().get(0).getId().getUserId());
+        assertEquals(ParticipantStatus.DELETED, result.getParticipants().get(0).getStatus());
     }
 }

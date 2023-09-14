@@ -43,7 +43,7 @@ public class SessionController {
 
         final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
         // return created session
-        return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(session)));
+        return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
 
     /**

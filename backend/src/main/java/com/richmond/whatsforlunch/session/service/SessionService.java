@@ -5,10 +5,12 @@ import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantId;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantStatus;
+import com.richmond.whatsforlunch.session.repository.entity.RestaurantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.dto.Owner;
 import com.richmond.whatsforlunch.session.service.dto.Participant;
+import com.richmond.whatsforlunch.session.service.dto.Restaurant;
 import com.richmond.whatsforlunch.session.service.dto.Session;
 import com.richmond.whatsforlunch.users.repository.UserRepository;
 import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +66,7 @@ public class SessionService {
         final SessionEntity session = SessionEntity.builder()
                 .date(date).owner(owner).status(SessionStatus.OPEN)
                 .participants(new ArrayList<>(participantIds.size()))
+                .restaurants(Collections.emptyList())
                 .build();
 
         // create participants
@@ -88,6 +92,7 @@ public class SessionService {
     private Session mapToBean(final SessionEntity entity) {
         return new Session(entity.getId(), entity.getDate(), mapToBean(entity.getOwner()),
                 entity.getParticipants().stream().map(this::mapToBean).collect(Collectors.toUnmodifiableList()),
+                entity.getRestaurants().stream().map(this::mapToBean).collect(Collectors.toUnmodifiableList()),
                 entity.getStatus().getName(), entity.getVersion());
     }
 
@@ -97,6 +102,10 @@ public class SessionService {
     private Participant mapToBean(final ParticipantEntity entity) {
         return new Participant(entity.getUser().getId(), entity.getUser().getUserName(), entity.getUser().getFirstName(),
                 entity.getStatus().getName());
+    }
+
+    private Restaurant mapToBean(final RestaurantEntity entity) {
+        return new Restaurant(entity.getId(), entity.getAddedByUser(), entity.getRestaurantName(), entity.getDescription());
     }
 
     /**

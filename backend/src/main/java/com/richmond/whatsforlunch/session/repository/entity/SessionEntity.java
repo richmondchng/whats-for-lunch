@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Data entity representing a session.
@@ -45,7 +45,10 @@ public class SessionEntity {
     private UserEntity owner;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "session")
-    private Collection<ParticipantEntity> participants;
+    private List<ParticipantEntity> participants;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "session")
+    private List<RestaurantEntity> restaurants;
 
     @Enumerated(EnumType.STRING)
     private SessionStatus status = SessionStatus.OPEN;

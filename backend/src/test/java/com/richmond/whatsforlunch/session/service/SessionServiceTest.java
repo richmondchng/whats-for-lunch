@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -190,7 +189,8 @@ class SessionServiceTest {
                 List.of(SessionEntity.builder()
                         .id(3L).date(LocalDate.of(2023, 9, 12))
                         .owner(UserEntity.builder().id(2L).build())
-                        .participants(new ArrayList<>())
+                        .participants(Collections.emptyList())
+                        .restaurants(Collections.emptyList())
                         .status(SessionStatus.OPEN)
                         .build())
         );
@@ -219,7 +219,8 @@ class SessionServiceTest {
                 List.of(SessionEntity.builder()
                         .id(3L).date(LocalDate.of(2023, 9, 12))
                         .owner(UserEntity.builder().id(2L).build())
-                        .participants(new ArrayList<>())
+                        .participants(Collections.emptyList())
+                        .restaurants(Collections.emptyList())
                         .status(SessionStatus.OPEN)
                         .build())
         );
@@ -236,4 +237,5 @@ class SessionServiceTest {
         assertEquals(1, paramStatus.size());
         assertTrue(paramStatus.contains(SessionStatus.OPEN));
     }
+
 }

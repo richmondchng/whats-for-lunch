@@ -9,9 +9,13 @@ import java.util.List;
  * @param date session date
  * @param owner session owner
  * @param participants session participants
+ * @param restaurants session restaurants
  * @param status session current status
  */
-public record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner, List<ResponseSessionParticipant> participants, String status) {}
+public record ResponseSession(long id, LocalDate date, ResponseSessionOwner owner,
+                              List<ResponseSessionParticipant> participants,
+                              List<ResponseSessionRestaurant> restaurants,
+                              String status) {}
 
 /**
  * Record describing session owner.
@@ -29,3 +33,12 @@ record ResponseSessionOwner(long id, String userName, String displayName) {}
  * @param status participant current status
  */
 record ResponseSessionParticipant(long id, String userName, String displayName, String status) {}
+
+/**
+ * Record describing session restaurant.
+ * @param id record id
+ * @param restaurantName restaurant name
+ * @param description description
+ * @param addedBy added by this user ID
+ */
+record ResponseSessionRestaurant(long id, String restaurantName, String description, long addedBy) {}

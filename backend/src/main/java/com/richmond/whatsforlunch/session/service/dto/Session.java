@@ -1,15 +1,16 @@
 package com.richmond.whatsforlunch.session.service.dto;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Service bean representing a Session.
  * @param id session ID
  * @param date session date
  * @param owner session owner
- * @param participants collection of session participants
+ * @param participants list of session participants
+ * @param restaurants list of session restaurants
  * @param status current session status
  * @param version version
  */
-public record Session(long id, LocalDate date, Owner owner, Collection<Participant> participants, String status, long version) { }
+public record Session(long id, LocalDate date, Owner owner, List<Participant> participants, List<Restaurant> restaurants, String status, long version) { }

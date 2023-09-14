@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,7 +65,7 @@ class SessionControllerTest {
                   new Owner(2L, "ed", "Edward"),
                   List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                           new Participant(5L, "peggy", "Peggy", "PENDING")),
-                  SessionStatus.OPEN.getName(), 1)
+                  Collections.emptyList(), SessionStatus.OPEN.getName(), 1)
         );
 
         final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
@@ -77,7 +78,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].owner.id", is(2)))
                 .andExpect(jsonPath("$.data[0].owner.userName", is("ed")))
                 .andExpect(jsonPath("$.data[0].owner.displayName", is("Edward")))
-                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
+
                 .andExpect(jsonPath("$.data[0].participants").isArray())
                 .andExpect(jsonPath("$.data[0].participants", hasSize(2)))
 
@@ -89,7 +90,12 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].participants[1].id", is(5)))
                 .andExpect(jsonPath("$.data[0].participants[1].userName", is("peggy")))
                 .andExpect(jsonPath("$.data[0].participants[1].displayName", is("Peggy")))
-                .andExpect(jsonPath("$.data[0].participants[1].status", is("PENDING")));
+                .andExpect(jsonPath("$.data[0].participants[1].status", is("PENDING")))
+
+                .andExpect(jsonPath("$.data[0].restaurants").isArray())
+                .andExpect(jsonPath("$.data[0].restaurants", hasSize(0)))
+                .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
+        ;
 
         verify(sessionService, times(1)).createNewSession(
                 eq(LocalDate.of(2023, 9, 12)),
@@ -167,7 +173,7 @@ class SessionControllerTest {
                             new Owner(2L, "ed", "Edward"),
                             List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                            SessionStatus.OPEN.getName(), 1))
+                            Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?owner=2"))
@@ -192,7 +198,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                        SessionStatus.OPEN.getName(), 1))
+                                Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5"))
@@ -217,7 +223,7 @@ class SessionControllerTest {
                         new Owner(2L, "ed", "Edward"),
                         List.of(new Participant(2L, "ed", "Edward", "PENDING"),
                                 new Participant(5L, "peggy", "Peggy", "PENDING")),
-                        SessionStatus.OPEN.getName(), 1))
+                                Collections.emptyList(), SessionStatus.OPEN.getName(), 1))
         );
 
         mockMvc.perform(get("/api/v1/sessions?participant=5&status=CLOSED,DELETED"))
@@ -229,4 +235,6 @@ class SessionControllerTest {
 
         verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("CLOSED", "DELETED"));
     }
+
+
 }

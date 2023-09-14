@@ -1,0 +1,305 @@
+{
+	"info": {
+		"_postman_id": "ca090b55-ce99-406b-b266-c72c8a431056",
+		"name": "What's for Lunch?",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8807919"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sessions",
+			"item": [
+				{
+					"name": "Create new session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2023-09-13\",\r\n    \"owner\": 2,\r\n    \"participants\": [2, 3]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all sessions by owner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions?owner=5&status=OPEN,CLOSED",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "5"
+								},
+								{
+									"key": "status",
+									"value": "OPEN,CLOSED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all sessions by participant",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions?participant=5",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "participant",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new restaurant to session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 4,\r\n    \"restaurant\": \"OutThere steak house\",\r\n    \"description\": \"Steaks for cheap!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6/restaurants",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6",
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new participant to session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"participants\": [3, 4, 5]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6/participants",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6",
+								"participants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get session by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete restaurant from session",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6/restaurants/2",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6",
+								"restaurants",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete participant from session",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6/participants/4",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6",
+								"participants",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete session",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close session",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"strategy\": \"RANDOM\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{servername}}/api/v1/sessions/6",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -40,5 +40,6 @@ record ResponseSessionParticipant(long id, String userName, String displayName, 
  * @param restaurantName restaurant name
  * @param description description
  * @param addedBy added by this user ID
+ * @param status restaurant current status
  */
-record ResponseSessionRestaurant(long id, String restaurantName, String description, long addedBy) {}
+record ResponseSessionRestaurant(long id, String restaurantName, String description, long addedBy, String status) {}

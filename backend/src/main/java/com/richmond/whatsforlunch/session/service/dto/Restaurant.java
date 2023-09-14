@@ -7,5 +7,5 @@ package com.richmond.whatsforlunch.session.service.dto;
  * @param restaurant restaurant name
  * @param description description
  */
-public record Restaurant (long id, long userId, String restaurant, String description) {
+public record Restaurant (long id, long userId, String restaurant, String description, String status) {
 }

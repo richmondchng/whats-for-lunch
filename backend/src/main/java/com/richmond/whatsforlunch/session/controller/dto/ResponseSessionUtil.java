@@ -44,6 +44,6 @@ public final class ResponseSessionUtil {
     }
 
     private static ResponseSessionRestaurant mapToBean(final Restaurant bean) {
-        return new ResponseSessionRestaurant(bean.id(), bean.restaurant(), bean.description(), bean.userId());
+        return new ResponseSessionRestaurant(bean.id(), bean.restaurant(), bean.description(), bean.userId(), bean.status());
     }
 }

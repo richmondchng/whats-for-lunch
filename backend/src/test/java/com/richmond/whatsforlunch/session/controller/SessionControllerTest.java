@@ -265,7 +265,7 @@ class SessionControllerTest {
 
         final Owner owner = new Owner(2L, "ed", "Edward");
         final Participant participant1 = new Participant(2L, "ed", "Edward", "PENDING");
-        final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food");
+        final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
         final Session session = new Session(99L, LocalDate.of(2023, 9, 12),
                 owner, List.of(participant1), List.of(restaurant1), SessionStatus.OPEN.getName(), 1);
         when(sessionService.getSessionById(anyLong())).thenReturn(session);
@@ -296,6 +296,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurants[0].addedBy", is(2)))
                 .andExpect(jsonPath("$.data[0].restaurants[0].restaurantName", is("Brian's Eatery")))
                 .andExpect(jsonPath("$.data[0].restaurants[0].description", is("Fusion food")))
+                .andExpect(jsonPath("$.data[0].restaurants[0].status", is("ACTIVE")))
 
                 .andExpect(jsonPath("$.data[0].status", is(SessionStatus.OPEN.getName())))
         ;

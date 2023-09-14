@@ -109,7 +109,8 @@ public class SessionService {
     }
 
     private Restaurant mapToBean(final RestaurantEntity entity) {
-        return new Restaurant(entity.getId(), entity.getAddedByUser(), entity.getRestaurantName(), entity.getDescription());
+        return new Restaurant(entity.getId(), entity.getAddedByUser(), entity.getRestaurantName(),
+                entity.getDescription(), entity.getStatus().getName());
     }
 
     /**

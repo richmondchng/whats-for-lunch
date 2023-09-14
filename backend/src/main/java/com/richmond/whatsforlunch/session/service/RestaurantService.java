@@ -2,6 +2,7 @@ package com.richmond.whatsforlunch.session.service;
 
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.RestaurantEntity;
+import com.richmond.whatsforlunch.session.repository.entity.RestaurantStatus;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
@@ -24,7 +25,6 @@ public class RestaurantService {
     private static final String ERROR_SESSION_ID_INVALID = "Session ID is invalid";
     private static final String ERROR_SESSION_NOT_OPENED = "Session is not open for submission";
     private static final String ERROR_USER_NOT_PARTICIPANT = "User is not a participant";
-
     private static final String ERROR_RESTAURANT_NAME_OVER_MAX = "Restaurant name is too long (max 255 character)";
     private static final String ERROR_DESCRIPTION_OVER_MAX = "Description is too long (max 255 character)";
 
@@ -57,6 +57,7 @@ public class RestaurantService {
         final RestaurantEntity restaurantEntity = RestaurantEntity.builder()
                 .session(session).addedByUser(userId)
                 .restaurantName(restaurant).description(description)
+                .status(RestaurantStatus.ACTIVE)
                 .build();
         session.getRestaurants().add(restaurantEntity);
 

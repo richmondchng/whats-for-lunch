@@ -5,6 +5,7 @@ import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantId;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantStatus;
 import com.richmond.whatsforlunch.session.repository.entity.RestaurantEntity;
+import com.richmond.whatsforlunch.session.repository.entity.RestaurantStatus;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.dto.Participant;
@@ -281,7 +282,8 @@ class SessionServiceTest {
                 .id(new ParticipantId(3L, 2L)).session(session).user(owner)
                 .status(ParticipantStatus.PENDING).build());
         session.getRestaurants().add(RestaurantEntity.builder()
-                .id(20L).addedByUser(2L).restaurantName("McFried Chicken").description("Yummy fried chicken").build());
+                .id(20L).addedByUser(2L).restaurantName("McFried Chicken").description("Yummy fried chicken")
+                .status(RestaurantStatus.ACTIVE).build());
         when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
 
         // when
@@ -312,5 +314,6 @@ class SessionServiceTest {
         assertEquals(2L, restaurant.userId());
         assertEquals("McFried Chicken", restaurant.restaurant());
         assertEquals("Yummy fried chicken", restaurant.description());
+        assertEquals("ACTIVE", restaurant.status());
     }
 }

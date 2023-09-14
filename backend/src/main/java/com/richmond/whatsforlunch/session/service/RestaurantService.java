@@ -36,12 +36,13 @@ public class RestaurantService {
                 || (StringUtils.isNotBlank(description) && description.length() < 255), ApplicationMessages.ERROR_DESCRIPTION_OVER_MAX);
 
         // find session
-        final SessionEntity session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
-        if(SessionStatus.ACTIVE != session.getStatus()) {
-            // session is not opened
-            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
-        }
+//        final SessionEntity session = sessionRepository.findById(sessionId)
+//                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+//        if(SessionStatus.ACTIVE != session.getStatus()) {
+//            // session is not opened
+//            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
+//        }
+        final SessionEntity session = getActiveSession(sessionId);
 
         // find user in participants
         final UserEntity user = session.getParticipants().stream()
@@ -50,7 +51,7 @@ public class RestaurantService {
 
         // add restaurant to session
         final RestaurantEntity restaurantEntity = RestaurantEntity.builder()
-                .session(session).addedByUser(userId)
+                .session(session).addedByUser(user.getId())
                 .restaurantName(restaurant).description(description)
                 .status(RestaurantStatus.ACTIVE)
                 .build();
@@ -58,5 +59,36 @@ public class RestaurantService {
 
         // save
         sessionRepository.saveAndFlush(session);
+    }
+
+    /**
+     * Delete restaurant from session.
+     * @param sessionId session ID
+     * @param restaurantId restaurant ID
+     */
+    public void deleteRestaurantFromSession(final long sessionId, final long restaurantId) {
+        // find session
+        final SessionEntity session = getActiveSession(sessionId);
+
+        // find restaurant in session
+        final RestaurantEntity restaurant = session.getRestaurants().stream()
+                .filter(r -> r.getId() == restaurantId).findAny()
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_RESTAURANT_NOT_IN_SESSION));
+
+        // update status flag
+        restaurant.setStatus(RestaurantStatus.DELETED);
+
+        // save
+        sessionRepository.saveAndFlush(session);
+    }
+
+    private SessionEntity getActiveSession(final long sessionId) {
+        final SessionEntity session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+        if(SessionStatus.ACTIVE != session.getStatus()) {
+            // session is not opened
+            throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
+        }
+        return session;
     }
 }

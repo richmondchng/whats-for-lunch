@@ -43,3 +43,7 @@
     ```shell
      java -jar -D"spring.profiles.active=demo" .\target\whatsforlunch-0.0.1-SNAPSHOT.jar
     ```
+   
+## REST API Documentation
+- http://`hostname`/swagger-ui/index.html
+- http://`hostname`/v3/api-docs

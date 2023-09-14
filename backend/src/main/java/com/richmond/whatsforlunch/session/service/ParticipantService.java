@@ -9,6 +9,7 @@ import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.util.ApplicationMessages;
 import com.richmond.whatsforlunch.users.repository.UserRepository;
 import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service managing participants
+ */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ParticipantService {
 
     private final SessionRepository sessionRepository;

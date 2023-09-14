@@ -46,7 +46,6 @@ class ParticipantServiceTest {
 
     private ParticipantService participantService;
 
-
     @BeforeEach
     void setUp() {
         participantService = new ParticipantService(sessionRepository, userRepository);
@@ -96,7 +95,7 @@ class ParticipantServiceTest {
             participantService.addParticipantsToSession(15L, List.of(6L, 7L));
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
-            assertEquals("Session is not open for submission", e.getMessage());
+            assertEquals("Session is active", e.getMessage());
         }
 
         // then

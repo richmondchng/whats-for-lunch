@@ -5,6 +5,7 @@ import com.richmond.whatsforlunch.session.controller.dto.ResponseSession;
 import com.richmond.whatsforlunch.session.controller.dto.ResponseSessionUtil;
 import com.richmond.whatsforlunch.session.service.SessionService;
 import com.richmond.whatsforlunch.session.service.dto.Session;
+import com.richmond.whatsforlunch.session.util.ApplicationMessages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,10 +32,6 @@ public class SessionController {
 
     private final SessionService sessionService;
 
-    private static final String ERROR_SESSION_ID_MANDATORY = "Session ID is mandatory";
-    private static final String ERROR_SESSION_DATE_MANDATORY = "Date is mandatory";
-    private static final String ERROR_SESSION_OWNER_ID_MANDATORY = "Owner Id is mandatory";
-
     /**
      * POST action to create a new session
      * @return newly create session
@@ -42,9 +39,8 @@ public class SessionController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> createNewSession(
             @RequestBody final RequestCreateNewSession request) {
-
-        Assert.notNull(request.date(), ERROR_SESSION_DATE_MANDATORY);
-        Assert.isTrue(request.owner() > 0, ERROR_SESSION_OWNER_ID_MANDATORY);
+        Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
+        Assert.isTrue(request.owner() > 0, ApplicationMessages.ERROR_SESSION_OWNER_ID_MANDATORY);
 
         final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
         // return created session
@@ -83,7 +79,7 @@ public class SessionController {
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> getSessionById(@PathVariable final long id) {
-        Assert.isTrue(id > 0, ERROR_SESSION_ID_MANDATORY);
+        Assert.isTrue(id > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
         final Session session = sessionService.getSessionById(id);
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }

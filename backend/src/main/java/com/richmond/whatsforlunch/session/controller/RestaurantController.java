@@ -2,6 +2,7 @@ package com.richmond.whatsforlunch.session.controller;
 
 import com.richmond.whatsforlunch.common.controller.StandardResponse;
 import com.richmond.whatsforlunch.session.service.RestaurantService;
+import com.richmond.whatsforlunch.session.util.ApplicationMessages;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -31,12 +32,13 @@ public class RestaurantController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseAddRestaurant>> addRestaurant(@PathVariable final long sessionId,
                                                                                  @RequestBody RequestAddRestaurant body) {
-        Assert.isTrue(body.userId() > 0, "User Id is mandatory");
-        Assert.isTrue(StringUtils.isNotBlank(body.restaurant()), "Restaurant is mandatory");
+        Assert.isTrue(sessionId > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
+        Assert.isTrue(body.userId() > 0, ApplicationMessages.ERROR_USER_ID_IS_MANDATORY);
+        Assert.isTrue(StringUtils.isNotBlank(body.restaurant()), ApplicationMessages.ERROR_RESTAURANT_IS_MANDATORY);
 
         restaurantService.addRestaurantToSession(sessionId, body.userId(), body.restaurant(), body.description());
 
-        return ResponseEntity.ok(new StandardResponse<>(new ResponseAddRestaurant("Success")));
+        return ResponseEntity.ok(new StandardResponse<>(new ResponseAddRestaurant(ApplicationMessages.SUCCESS_MESSAGE)));
     }
 }
 

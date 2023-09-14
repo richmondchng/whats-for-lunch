@@ -30,9 +30,8 @@ class RestaurantControllerTest {
     @MockBean
     private RestaurantService restaurantService;
 
-
     /**
-     * Given request body is valid, when invoke POST /api/v1/sessions/{sessionId}/restaurant, return success status
+     * Given request body is valid, when invoke POST /api/v1/sessions/{sessionId}/restaurants, return success status
      * @throws Exception exception
      */
     @Test
@@ -50,7 +49,7 @@ class RestaurantControllerTest {
     }
 
     /**
-     * Given request body does not contain mandatory user Id field, when invoke POST /api/v1/sessions/{sessionId}/restaurant, fail and throw error
+     * Given request body does not contain mandatory user Id field, when invoke POST /api/v1/sessions/{sessionId}/restaurants, fail and throw error
      * @throws Exception exception
      */
     @Test
@@ -62,14 +61,14 @@ class RestaurantControllerTest {
                 .andExpect(jsonPath("$.timestamp", notNullValue()))
                 .andExpect(jsonPath("$.status", is(400)))
                 .andExpect(jsonPath("$.error", is("Bad Request")))
-                .andExpect(jsonPath("$.message", is("User Id is mandatory")))
+                .andExpect(jsonPath("$.message", is("User ID is mandatory")))
                 .andExpect(jsonPath("$.path", is("/api/v1/sessions/2/restaurants")));
 
         verifyNoInteractions(restaurantService);
     }
 
     /**
-     * Given request body does not contain mandatory restaurant field, when invoke POST /api/v1/sessions/{sessionId}/restaurant, fail and throw error
+     * Given request body does not contain mandatory restaurant field, when invoke POST /api/v1/sessions/{sessionId}/restaurants, fail and throw error
      * @throws Exception exception
      */
     @Test

@@ -3,8 +3,14 @@
 ## Project Notes:
 - Application is built in Java 17, with Maven
 - At the current version, application is backed by an embedded H2 database (for demo/development purpose)
-- A default `admin` user will be created when backend application is started up
 - Default port is 8080. For example, if application is started up in localhost then the `host` will be `localhost:8080`
+- There are 2 main top-level packages - `users` and `session`
+  - `users` package contain implementation for all user-related features - e.g., API to get users
+  - `session` is the main package contain implementation for managing lunch session - e.g., creating session, adding participants and restaurant 
+- A default `admin` user will be created when backend application is started up
+- Security
+  - User(s) are managed within the application, see the `users` package
+  - Using self-signed JWT tokens
 
 ## Demo mode
 - Application will inject sample data into the application

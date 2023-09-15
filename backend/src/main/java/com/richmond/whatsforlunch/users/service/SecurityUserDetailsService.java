@@ -6,6 +6,7 @@ import com.richmond.whatsforlunch.users.repository.entity.UserEntity;
 import com.richmond.whatsforlunch.users.service.dto.SecurityUserDetails;
 import com.richmond.whatsforlunch.users.service.dto.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +19,7 @@ import java.util.Arrays;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

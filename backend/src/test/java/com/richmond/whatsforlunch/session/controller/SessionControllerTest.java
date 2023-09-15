@@ -304,6 +304,7 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenRequestIsValid_whenDeleteSession_returnSuccessStatus() throws Exception {
 
         mockMvc.perform(delete("/api/v1/sessions/2"))
@@ -312,7 +313,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].status", is("Success")));
 
-        verify(sessionService, times(1)).deleteSession(2L);
+        verify(sessionService, times(1)).deleteSession(2L, "ed");
     }
 
     /**
@@ -320,6 +321,7 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenSessionIdIsZero_whenDeleteSession_returnError() throws Exception {
 
         mockMvc.perform(delete("/api/v1/sessions/0"))

@@ -1,5 +1,6 @@
 package com.richmond.whatsforlunch.session.service;
 
+import com.richmond.whatsforlunch.session.exception.CurrentUserIsNotOwnerException;
 import com.richmond.whatsforlunch.session.exception.UserNotFoundException;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
@@ -122,11 +123,16 @@ public class SessionService {
     /**
      * Delete session
      * @param id session ID
+     * @param actionedBy username who actioned
      */
-    public void deleteSession(final long id) {
+    public void deleteSession(final long id, final String actionedBy) {
         // get session
         final SessionEntity session = sessionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+        // check it's the owner
+        if(!session.getOwner().getUserName().equals(actionedBy)) {
+            throw new CurrentUserIsNotOwnerException();
+        }
 
         // flag session
         session.setStatus(SessionStatus.DELETED);

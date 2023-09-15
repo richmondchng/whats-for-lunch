@@ -330,7 +330,7 @@ class SessionServiceTest {
 
         // when
         try {
-            sessionService.deleteSession(99999L);
+            sessionService.deleteSession(99999L, "steven");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
             assertEquals("Session ID is invalid", e.getMessage());
@@ -338,6 +338,33 @@ class SessionServiceTest {
 
         // verify
         verify(sessionRepository, times(1)).findById(eq(99999L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given current user is not owner, when deleteSession, throw exception
+     */
+    @Test
+    void givenNotOwner_whenDeleteSession_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13))
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .build();
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        try {
+            sessionService.deleteSession(12L, "steven");
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Current user is not the session owner", e.getMessage());
+        }
+
+        // verify
+        verify(sessionRepository, times(1)).findById(eq(12L));
         verify(sessionRepository, times(0)).saveAndFlush(any());
     }
 
@@ -356,7 +383,7 @@ class SessionServiceTest {
         when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
 
         // when
-        sessionService.deleteSession(15L);
+        sessionService.deleteSession(15L, "ed");
 
         // verify
         verify(sessionRepository, times(1)).findById(eq(15L));

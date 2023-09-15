@@ -98,9 +98,9 @@ public class SessionController {
      * @return action status
      */
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id) {
+    public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id, final Principal principal) {
         Assert.isTrue(id > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
-        sessionService.deleteSession(id);
+        sessionService.deleteSession(id, principal.getName());
         return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(id, "DELETE",
                 ApplicationMessages.SUCCESS_MESSAGE)));
     }

@@ -35,7 +35,8 @@ public class UserService {
      * @return User
      */
     private User mapToBean(final UserEntity entity) {
-        return new User(entity.getId(), entity.getUserName(), entity.getFirstName(), entity.getLastName());
+        return new User(entity.getId(), entity.getUserName(), null, null,
+                entity.getFirstName(), entity.getLastName());
     }
 }
 

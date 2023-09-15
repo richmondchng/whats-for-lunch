@@ -1,10 +1,12 @@
 package com.richmond.whatsforlunch.session.controller;
 
+import com.richmond.whatsforlunch.common.config.TestSecurityConfig;
 import com.richmond.whatsforlunch.session.service.ParticipantService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test ParticipantController.
  */
 @WebMvcTest(controllers = { ParticipantController.class })
+@Import({ TestSecurityConfig.class })
 class ParticipantControllerTest {
 
     @Autowired

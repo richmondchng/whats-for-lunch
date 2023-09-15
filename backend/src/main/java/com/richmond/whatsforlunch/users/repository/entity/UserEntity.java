@@ -34,6 +34,10 @@ public class UserEntity {
 
     private String userName;
 
+    private String password;
+
+    private String roles;
+
     private String firstName;
 
     private String lastName;

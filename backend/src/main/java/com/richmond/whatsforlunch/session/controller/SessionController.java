@@ -45,11 +45,12 @@ public class SessionController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> createNewSession(
-            @RequestBody final RequestCreateNewSession request, Principal principal) {
+            @RequestBody final RequestCreateNewSession request, final Principal principal) {
 
         Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
 
-        final Session session = sessionService.createNewSession(request.date(), principal.getName(), request.participants());
+        final Session session = sessionService.createNewSession(request.date(), principal.getName(),
+                request.participants());
         // return created session
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
@@ -100,7 +101,8 @@ public class SessionController {
     public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id) {
         Assert.isTrue(id > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
         sessionService.deleteSession(id);
-        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(id, "DELETE", ApplicationMessages.SUCCESS_MESSAGE)));
+        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(id, "DELETE",
+                ApplicationMessages.SUCCESS_MESSAGE)));
     }
 
     /**
@@ -110,13 +112,14 @@ public class SessionController {
      * @return ResponseSession
      */
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StandardResponse<ResponsePatchSession>> patchSession(@PathVariable final long id,
-                                                                          @RequestBody final RequestPatchSession body) {
-        final Restaurant restaurant = selectionService.selectRestaurant(id,
+    public ResponseEntity<StandardResponse<ResponsePatchSession>> patchSession(
+            @PathVariable final long id, @RequestBody final RequestPatchSession body, final Principal principal) {
+        final Restaurant restaurant = selectionService.selectRestaurant(id, principal.getName(),
                 // default to random
                 StringUtils.isBlank(body.strategy()) ? "RANDOM" : body.strategy());
 
-        return ResponseEntity.ok(new StandardResponse<>(new ResponsePatchSession(id, restaurant.id(), restaurant.restaurant())));
+        return ResponseEntity.ok(new StandardResponse<>(new ResponsePatchSession(id, restaurant.id(),
+                restaurant.restaurant())));
     }
 }
 

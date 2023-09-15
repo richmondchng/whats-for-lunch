@@ -1,5 +1,6 @@
 package com.richmond.whatsforlunch.session.service;
 
+import com.richmond.whatsforlunch.session.exception.CurrentUserIsNotOwnerException;
 import com.richmond.whatsforlunch.session.exception.NoRestaurantInSessionException;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.RestaurantStatus;
@@ -30,10 +31,11 @@ public class SelectionService {
     /**
      * Select a restaurant from the session, then close the session
      * @param sessionId session ID
+     * @param actionedBy actioned by username
      * @param strategy selection strategy
      * @return updated Session
      */
-    public Restaurant selectRestaurant(final long sessionId, final  String strategy) {
+    public Restaurant selectRestaurant(final long sessionId, final String actionedBy, final String strategy) {
         // get session
         final SessionEntity session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
@@ -41,9 +43,15 @@ public class SelectionService {
             // session is not opened
             throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
         }
+        // check it's the owner
+        if(!session.getOwner().getUserName().equals(actionedBy)) {
+            throw new CurrentUserIsNotOwnerException();
+        }
+        // check at least 1 restaurant in session
         if(session.getRestaurants().size() == 0) {
             throw new NoRestaurantInSessionException();
         }
+
         // pick strategy
         final RestaurantSelectionStrategy selector = restaurantSelectionStrategyFactory.getStrategy(strategy);
 

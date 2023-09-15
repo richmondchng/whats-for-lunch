@@ -338,10 +338,11 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenValidRequest_whenPatchSession_returnSessionDetails() throws Exception {
 
         final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
-        when(selectionService.selectRestaurant(anyLong(), anyString())).thenReturn(restaurant1);
+        when(selectionService.selectRestaurant(anyLong(), anyString(), anyString())).thenReturn(restaurant1);
 
         final String content = "{\"strategy\":\"RANDOM\"}";
         mockMvc.perform(patch("/api/v1/sessions/99").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
@@ -352,6 +353,6 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurantId", is(5)))
                 .andExpect(jsonPath("$.data[0].restaurantName", is("Brian's Eatery")));
 
-        verify(selectionService, times(1)).selectRestaurant(eq(99L), eq("RANDOM"));
+        verify(selectionService, times(1)).selectRestaurant(eq(99L), eq("ed"), eq("RANDOM"));
     }
 }

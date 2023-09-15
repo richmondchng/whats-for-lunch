@@ -42,23 +42,17 @@ public class SessionService {
     /**
      * Create new session.
      * @param date for date
-     * @param ownerId by owner
+     * @param ownerUserName by owner username
      * @param participantIds with participants
      * @return newly created session
      */
-    public Session createNewSession(final LocalDate date, final long ownerId, final List<Long> participantIds) {
+    public Session createNewSession(final LocalDate date, final String ownerUserName, final List<Long> participantIds) {
 
-        final List<Long> userIds = new ArrayList<>(participantIds);
-        userIds.add(ownerId);
+        final UserEntity owner = userRepository.findByUserName(ownerUserName)
+                .orElseThrow(() -> new UserNotFoundException(ApplicationMessages.ERROR_OWNER_NOT_FOUND));
 
-        final Map<Long, UserEntity> userMap = userRepository.findAllById(userIds)
+        final Map<Long, UserEntity> userMap = userRepository.findAllById(participantIds)
                 .stream().collect(Collectors.toMap(UserEntity::getId, Function.identity()));
-
-        final UserEntity owner = userMap.get(ownerId);
-        if(owner == null) {
-            // owner ID is not valid
-            throw new UserNotFoundException(ApplicationMessages.ERROR_OWNER_NOT_FOUND);
-        }
 
         // create a new session
         final SessionEntity session = SessionEntity.builder()

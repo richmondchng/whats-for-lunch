@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +45,11 @@ public class SessionController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> createNewSession(
-            @RequestBody final RequestCreateNewSession request) {
-        Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
-        Assert.isTrue(request.owner() > 0, ApplicationMessages.ERROR_SESSION_OWNER_ID_MANDATORY);
+            @RequestBody final RequestCreateNewSession request, Principal principal) {
 
-        final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
+        Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
+
+        final Session session = sessionService.createNewSession(request.date(), principal.getName(), request.participants());
         // return created session
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
@@ -122,10 +123,9 @@ public class SessionController {
 /**
  * Request body for creating new session
  * @param date session date
- * @param owner session owner id
  * @param participants collection of participants' Ids
  */
-record RequestCreateNewSession(LocalDate date, long owner, List<Long> participants) {}
+record RequestCreateNewSession(LocalDate date, List<Long> participants) {}
 
 /**
  * Request to patch (i.e., to select a restaurant)

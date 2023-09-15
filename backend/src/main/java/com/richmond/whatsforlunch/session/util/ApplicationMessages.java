@@ -12,7 +12,7 @@ public final class ApplicationMessages {
     public static final String ERROR_RESTAURANT_MANDATORY = "Restaurant is mandatory";
     public static final String ERROR_RESTAURANT_ID_MANDATORY = "Restaurant ID is mandatory";
     public static final String ERROR_PARTICIPANT_ID_MANDATORY = "Participant ID is mandatory";
-    public static final String ERROR_PATCH_SESSION_STATUS_MANDATORY = "Patch session status is mandatory";
+    public static final String ERROR_SESSION_OWNER_IS_NOT_CURRENT_USER = "Current user is not the session owner";
     public static final String SUCCESS_MESSAGE = "Success";
 
     public static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";

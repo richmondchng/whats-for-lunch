@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -68,9 +69,10 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenRequestBodyIsValid_whenCreateNewSession_returnNewSession() throws Exception {
 
-        when(sessionService.createNewSession(any(LocalDate.class), anyLong(), anyList())).thenReturn(
+        when(sessionService.createNewSession(any(LocalDate.class), anyString(), anyList())).thenReturn(
           new Session(99L, LocalDate.of(2023, 9, 12),
                   new Owner(2L, "ed", "Edward"),
                   List.of(new Participant(2L, "ed", "Edward", "PENDING"),
@@ -78,7 +80,7 @@ class SessionControllerTest {
                   Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1)
         );
 
-        final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
+        final String content = "{\"date\":\"2023-09-12\", \"participants\": [2, 5]}";
         mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
@@ -110,7 +112,7 @@ class SessionControllerTest {
 
         verify(sessionService, times(1)).createNewSession(
                 eq(LocalDate.of(2023, 9, 12)),
-                eq(2L),
+                eq("ed"),
                 participantsCaptor.capture());
         final Set<Long> expectedParticipants = Stream.of(2L, 5L).collect(Collectors.toSet());
         for (long id : participantsCaptor.getValue()) {
@@ -124,34 +126,16 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "john")
     void givenRequestBodyWithoutDate_whenCreateNewSession_returnError() throws Exception {
 
-        final String content = "{\"owner\":2, \"participants\": [2]}";
+        final String content = "{\"participants\": [2]}";
         mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.timestamp", notNullValue()))
                 .andExpect(jsonPath("$.status", is(400)))
                 .andExpect(jsonPath("$.error", is("Bad Request")))
                 .andExpect(jsonPath("$.message", is("Date is mandatory")))
-                .andExpect(jsonPath("$.path", is("/api/v1/sessions")));
-
-        verifyNoInteractions(sessionService);
-    }
-
-    /**
-     * Given request body does not contain mandatory owner field, when invoke POST /api/v1/sessions, fail and throw error
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestBodyWithoutOwnerId_whenCreateNewSession_returnError() throws Exception {
-
-        final String content = "{\"date\":\"2023-09-12\", \"participants\": [2, 5, 6, 7]}";
-        mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is(400)))
-                .andExpect(jsonPath("$.error", is("Bad Request")))
-                .andExpect(jsonPath("$.message", is("Owner Id is mandatory")))
                 .andExpect(jsonPath("$.path", is("/api/v1/sessions")));
 
         verifyNoInteractions(sessionService);

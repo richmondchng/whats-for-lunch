@@ -1,5 +1,6 @@
 package com.richmond.whatsforlunch.session.service;
 
+import com.richmond.whatsforlunch.session.exception.NoRestaurantInSessionException;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.RestaurantStatus;
 import com.richmond.whatsforlunch.session.repository.entity.SessionEntity;
@@ -40,7 +41,9 @@ public class SelectionService {
             // session is not opened
             throw new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_NOT_OPENED);
         }
-
+        if(session.getRestaurants().size() == 0) {
+            throw new NoRestaurantInSessionException();
+        }
         // pick strategy
         final RestaurantSelectionStrategy selector = restaurantSelectionStrategyFactory.getStrategy(strategy);
 

@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,6 @@ class SelectionServiceTest {
     private SessionRepository sessionRepository;
     @Mock
     private RestaurantSelectionStrategy restaurantSelectionStrategy;
-
     private SelectionService selectionService;
 
     @BeforeEach
@@ -102,6 +102,35 @@ class SelectionServiceTest {
 
         // verify
         verify(sessionRepository, times(1)).findById(eq(15L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given no restaurant in session, when selectRestaurant, throw exception
+     */
+    @Test
+    void givenNoRestaurantInSession_whenSelectRestaurant_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13)).status(SessionStatus.ACTIVE)
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .restaurants(Collections.emptyList())
+                .selectedRestaurant(0L)
+                .build();
+        // given
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        try {
+            selectionService.selectRestaurant(99999L, "RANDOM");
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("No restaurant in session, please add one restaurant to continue", e.getMessage());
+        }
+
+        // verify
+        verify(sessionRepository, times(1)).findById(eq(99999L));
         verify(sessionRepository, times(0)).saveAndFlush(any());
     }
 

@@ -2,6 +2,7 @@ package com.richmond.whatsforlunch.common.config;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
@@ -25,8 +27,8 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, HandlerMappingIntrospector introspector,
-                                                   UserDetailsService userDetailsService, JwtDecoder jwtDecoder) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, @Qualifier("mvcHandlerMappingIntrospector") HandlerMappingIntrospector introspector,
+                                                   UserDetailsService userDetailsService, JwtDecoder jwtDecoder, @Qualifier("corsConfiguration") CorsConfigurationSource configurationSource) throws Exception {
         MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
         return httpSecurity
                 .csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**"), mvc.pattern("/api/v1/**")))
@@ -40,6 +42,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))  // enable for H2 console
                 .httpBasic(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(configurationSource))
                 .build();
     }
 

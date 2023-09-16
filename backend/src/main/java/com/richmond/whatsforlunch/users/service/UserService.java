@@ -30,6 +30,17 @@ public class UserService {
     }
 
     /**
+     * Get user by username
+     * @param userName user name
+     * @return User
+     */
+    public User getUserByUserName(final String userName) {
+        return userRepository.findByUserName(userName)
+                .map(this::mapToBean)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+    }
+
+    /**
      * Map entity to service bean
      * @param entity UserEntity
      * @return User

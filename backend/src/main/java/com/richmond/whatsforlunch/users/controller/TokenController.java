@@ -27,7 +27,7 @@ public class TokenController {
      */
     @PostMapping
     public StandardResponse<ResponseUserToken> token(Authentication authentication) {
-        log.debug("Token requested for user: '{}'", authentication.getName());
+        log.info("Token requested for user: '{}'", authentication.getName());
         String token = tokenService.generateToken(authentication);
         return new StandardResponse<>(new ResponseUserToken(token));
     }

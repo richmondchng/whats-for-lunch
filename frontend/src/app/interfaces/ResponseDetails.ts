@@ -10,6 +10,19 @@ interface SessionBody {
         userName: string;
         displayName: string;
     };
+    participants: [{
+        id: number;
+        userName: string;
+        displayName: string;
+        status: string;
+    }],
+    restaurants: [{
+        id: number;
+        restaurantName: string;
+        description: string;
+        addedBy: number,
+        status: string;
+    }],
     selectedRestaurant?: string;
     status: string;
 }

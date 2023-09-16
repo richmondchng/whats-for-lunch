@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { SessionDetails } from '../interfaces/SessionDetails';
-import { ResponseSessions, ResponseDeleteSession } from '../interfaces/ResponseDetails';
+import { ResponseSessions, SessionBody, ResponseDeleteSession } from '../interfaces/ResponseDetails';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,7 +12,7 @@ export class SessionsService {
 
   constructor(private http: HttpClient) { }
 
-  getSessionForUser() : Observable<SessionDetails[]> {
+  getSessionForUser() : Observable<SessionBody[]> {
 
       const url = `${environment.apiUrl}/sessions`;
       const headers = new HttpHeaders({
@@ -23,23 +22,27 @@ export class SessionsService {
       return this.http.get<ResponseSessions>(url, {headers: headers})
       .pipe(
         map((response:ResponseSessions) => {
-          const results: SessionDetails[] = response.data.map((item) => {
-            const obj: SessionDetails = {
-              id: item.id,
-              sessionDate: item.date,
-              ownerName: item.owner.displayName,
-              ownerId: item.owner.id,
-              status: item.status,
-              selectedRestaurant: item.selectedRestaurant,
-            }
-            return obj;
-          });
-          return results;
+          return response.data;
         })
       );
   }
 
-  deleteSession(session: SessionDetails): Observable<ResponseDeleteSession> {
+  getSession(id: number) : Observable<SessionBody> {
+
+    const url = `${environment.apiUrl}/sessions/${id}`;
+    const headers = new HttpHeaders({
+      'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+      'Content-Type' : 'application/x-www-form-urlencoded'
+    });
+    return this.http.get<ResponseSessions>(url, {headers: headers})
+    .pipe(
+      map((response:ResponseSessions) => {
+        return response.data[0];
+      })
+    );
+}
+
+  deleteSession(session: SessionBody): Observable<ResponseDeleteSession> {
     const headers = new HttpHeaders({
       'Authorization' : 'Bearer ' + localStorage.getItem("token"),
       'Content-Type' : 'application/x-www-form-urlencoded'

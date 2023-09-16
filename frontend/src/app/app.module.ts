@@ -10,6 +10,7 @@ import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { SessionOverviewCardComponent } from './components/session-overview-card/session-overview-card.component';
 import { SessionCreateFormComponent } from './components/session-create-form/session-create-form.component';
+import { SessionDetailsComponent } from './components/session-details/session-details.component';
 // import { MatDatepickerModule } from '@angular/material/datepicker';
 // import { MatFormFieldModule } from '@angular/material/form-field';
 // import { MatNativeDateModule } from '@angular/material/core';
@@ -25,7 +26,8 @@ import { SessionCreateFormComponent } from './components/session-create-form/ses
     LoginComponent,
     HomeComponent,
     SessionOverviewCardComponent,
-    SessionCreateFormComponent
+    SessionCreateFormComponent,
+    SessionDetailsComponent
   ],
   imports: [
     BrowserModule,

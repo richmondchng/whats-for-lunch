@@ -1,4 +1,7 @@
-<div class="session-list-item">
+<div 
+    class="session-list-item"
+    [ngClass]="{ 'session-list-item-owner' : sessionOwner }"
+>
     <h3>{{ session.sessionDate }}<fa-icon [icon]="faTimes" (click)="onDelete(session)"></fa-icon></h3>
     Open by: {{ session.ownerName }}
 </div>

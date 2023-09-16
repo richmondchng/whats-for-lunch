@@ -1,1 +1,30 @@
-<h2>{{ session.date }}</h2>
+<div class="session-dashboard">
+    <h2>{{ session?.date }}</h2>
+    <div class="session-group">
+        <div class="session-group-item">
+            <h2>Participants</h2>
+            <div class="session-list">
+                <div class="session-list-item" *ngFor="let participant of session?.participants">{{participant.userName}}</div>
+            </div>
+        </div>
+        <div class="session-group-item">
+            <h2>Restaurants</h2>
+            <div class="session-list">
+                <div class="session-list-item" *ngFor="let restaurant of session?.restaurants">{{restaurant.restaurantName}}</div>
+            </div>
+        </div>
+    </div>
+    <form (submit)="addRestaurant()">
+        <div class="form-control">
+            <label for="restaurant">Restaurant</label>
+            <input type="text" name="restaurant" id="restaurant" placeholder="Restaurant name" 
+                [(ngModel)]="restaurant.name" />
+        </div>
+        <div class="form-control">
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description" placeholder="Optional description..." 
+                [(ngModel)]="restaurant.description" />
+        </div>
+        <input type="submit" class="btn form-control-btn" value="Add" />
+    </form>
+</div>

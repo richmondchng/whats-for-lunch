@@ -47,16 +47,26 @@ interface UserBody {
 }
 
 interface ResponseDeleteSession {
-    data: DeleteSessionBody[]
+    data: [{
+        sessionId: number;
+        action: string;
+        status: string;
+    }]
 }
 
-interface DeleteSessionBody {
-    sessionId: number;
-    action: string;
-    status: string;
+// interface DeleteSessionBody {
+//     sessionId: number;
+//     action: string;
+//     status: string;
+// }
+
+interface ResponseAddRestaurant {
+    data: [{
+        status: string;
+    }]
 }
 
 export {
     ResponseSessions, SessionBody, ResponseTokens, TokenBody, ResponseUsers, UserBody,
-    ResponseDeleteSession, DeleteSessionBody
+    ResponseDeleteSession, ResponseAddRestaurant
 }

@@ -13,24 +13,28 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 export class HomeComponent implements OnInit {
 
   faTimes = faTimes;
-  data: SessionDetails[] = [];
+  sessions: SessionDetails[] = [];
 
-  constructor(private sessionsService: SessionsService, private router: Router) {
-    console.log("hello");
-  }
+  constructor(private sessionsService: SessionsService, private router: Router) {}
 
   ngOnInit(): void {
-    console.log("init");
-    // let token = localStorage.getItem("token");
-    // if(!token) {
-    //    this.router.navigateByUrl('/login');
-    // } else {
-    this.sessionsService.getSessionForUser().subscribe((sessions) => (this.data = sessions));
+    this.sessionsService.getSessionForUser().subscribe(
+      // sort descending
+      (sessions) => (this.sessions = sessions.sort((a, b) => a.sessionDate >= b.sessionDate ? -1 : 1))
+    );
+  }
 
-    // this.authenticationService.loadLoggedInUser(token as string).subscribe((response:Me) => {
-    //     console.log(JSON.stringify(response));
-    //     // localStorage.setItem("user", JSON.stringify(response));
-    //   })
-    //}
+  findActiveSessions(data: SessionDetails[]) : SessionDetails[] {
+    return data.filter(s => s.status !== 'CLOSED' && s.status !== 'DELETED');
+  }
+
+  findClosedSessions(data: SessionDetails[]) : SessionDetails[] {
+    return data.filter(s => s.status === 'CLOSED');
+  }
+
+  deleteSession(session: SessionDetails) {
+    this.sessionsService.deleteSession(session)
+      // on success, refresh records
+      .subscribe(() => (this.sessions = this.sessions.filter((s) => s.id !== session.id)));
   }
 }

@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, pipe, of } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { SessionDetails } from '../interfaces/SessionDetails';
-import { ResponseSessions, SessionBody } from '../interfaces/ResponseDetails';
+import { ResponseSessions, SessionBody, ResponseDeleteSession, DeleteSessionBody } from '../interfaces/ResponseDetails';
 
 
 @Injectable({
@@ -36,5 +36,14 @@ export class SessionsService {
           return results;
         })
       );
+  }
+
+  deleteSession(session: SessionDetails): Observable<ResponseDeleteSession> {
+    const headers = new HttpHeaders({
+      'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+      'Content-Type' : 'application/x-www-form-urlencoded'
+    });
+    const url = "http://localhost:8080/api/v1/sessions/" + session.id; //`${this.apiUrl}/${task.id}`;
+    return this.http.delete<ResponseDeleteSession>(url, {headers: headers});
   }
 }

@@ -33,6 +33,17 @@ interface UserBody {
     lastName: string;
 }
 
+interface ResponseDeleteSession {
+    data: DeleteSessionBody[]
+}
+
+interface DeleteSessionBody {
+    sessionId: number;
+    action: string;
+    status: string;
+}
+
 export {
-    ResponseSessions, SessionBody, ResponseTokens, TokenBody, ResponseUsers, UserBody
+    ResponseSessions, SessionBody, ResponseTokens, TokenBody, ResponseUsers, UserBody,
+    ResponseDeleteSession, DeleteSessionBody
 }

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { LoginService } from 'src/app/services/login.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Credentials } from 'src/app/interfaces/Credentials';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ export class LoginComponent {
   credentials: Credentials = {username: "", password: ""};
   title = "Login";
 
-  constructor(private loginService: LoginService, private http: HttpClient, private router: Router) {}
+  constructor(private authenticationService: AuthenticationService, private http: HttpClient, private router: Router) {}
 
   login() {
     // this.loginService.authenticate(this.credentials, () => {
@@ -24,10 +24,9 @@ export class LoginComponent {
     // });
     // return false;
 
-    this.loginService.authenticate(this.credentials).subscribe(response => {
+    this.authenticationService.authenticate(this.credentials).subscribe((response:boolean) => {
       console.log("got token " + response);
-      localStorage.setItem('token', response);
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/home');
     });
 
     // this.loginService.authenticate(this.credentials).pipe(

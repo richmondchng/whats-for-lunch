@@ -1,0 +1,56 @@
+.session-dashboard {  
+    display: flexbox;
+}
+  
+.session-group {
+    list-style-type: none;
+    padding: 0;
+    white-space: nowrap;
+    width: fit-content;
+    display: flex;
+}
+  
+.session-group-item {
+    transition: 0.3s;
+    width: 370px;
+    min-height: 100%;
+    text-align: left;
+    vertical-align: top;
+    display: inline-block;
+    margin-right: 2em;
+    flex: 1;
+}
+
+.session-group-item h2 {
+    padding-top: 0;
+    margin-top: 0;
+}
+  
+.session-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.session-list-item {
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+    background-color: floralwhite;
+    transition: 0.3s;
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+}
+
+.session-list-item-owner {
+    border-left: 5px solid green;
+}
+  
+.session-list-item h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    margin-top: 0;
+}

@@ -5,6 +5,7 @@ import { Me } from '../interfaces/Me';
 import { Observable, of } from 'rxjs';
 import { concatMap} from 'rxjs/operators'
 import { ResponseTokens, ResponseUsers, UserBody } from '../interfaces/ResponseDetails';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +19,8 @@ export class AuthenticationService {
         'Authorization' : 'Basic ' + btoa(credentials.username + ':' + credentials.password),
         'Content-Type' : 'application/x-www-form-urlencoded'
       });
-
-    return this.http.post<ResponseTokens>('http://localhost:8080/api/v1/tokens', null, {headers : headers})
+    const url = `${environment.apiUrl}/tokens`;
+    return this.http.post<ResponseTokens>(url, null, {headers : headers})
       .pipe(
         concatMap((response:ResponseTokens) => {
           let token = response.data[0].accessToken;
@@ -28,7 +29,8 @@ export class AuthenticationService {
             'Authorization' : 'Bearer ' + token,
             'Content-Type' : 'application/x-www-form-urlencoded'
           });
-          return this.http.get<ResponseUsers>('http://localhost:8080/api/v1/currentuser', {headers : headers});
+          const url = `${environment.apiUrl}/currentuser`;
+          return this.http.get<ResponseUsers>(url, {headers : headers});
         }),
         concatMap((response:ResponseUsers) => {
           const data:UserBody = response.data[0];

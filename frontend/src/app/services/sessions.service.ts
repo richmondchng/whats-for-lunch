@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, pipe, of } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { SessionDetails } from '../interfaces/SessionDetails';
-import { ResponseSessions, SessionBody, ResponseDeleteSession, DeleteSessionBody } from '../interfaces/ResponseDetails';
-
+import { ResponseSessions, ResponseDeleteSession } from '../interfaces/ResponseDetails';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +15,12 @@ export class SessionsService {
 
   getSessionForUser() : Observable<SessionDetails[]> {
 
+      const url = `${environment.apiUrl}/sessions`;
       const headers = new HttpHeaders({
         'Authorization' : 'Bearer ' + localStorage.getItem("token"),
         'Content-Type' : 'application/x-www-form-urlencoded'
       });
-      return this.http.get<ResponseSessions>('http://localhost:8080/api/v1/sessions', {headers: headers})
+      return this.http.get<ResponseSessions>(url, {headers: headers})
       .pipe(
         map((response:ResponseSessions) => {
           const results: SessionDetails[] = response.data.map((item) => {
@@ -43,7 +44,7 @@ export class SessionsService {
       'Authorization' : 'Bearer ' + localStorage.getItem("token"),
       'Content-Type' : 'application/x-www-form-urlencoded'
     });
-    const url = "http://localhost:8080/api/v1/sessions/" + session.id; //`${this.apiUrl}/${task.id}`;
+    const url = `${environment.apiUrl}/sessions/${session.id}`;
     return this.http.delete<ResponseDeleteSession>(url, {headers: headers});
   }
 }

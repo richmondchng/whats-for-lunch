@@ -187,14 +187,14 @@ class SessionServiceTest {
 
         assertFalse(itrE.hasNext());
     }
-
     /**
-     * Given owner ID, when get sessions by owner, return sessions
+     * Given username, when get sessions by user, return sessions
      */
     @Test
-    void givenOwnerId_whenGetSessionsByOwner_returnSessionsByOwner() {
+    void givenUsername_whenGetSessionsByUser_returnSessionsByUser() {
         // given
-        when(sessionRepository.findByOwnerAndStatus(anyLong(), anySet())).thenReturn(
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(UserEntity.builder().id(22L).build()));
+        when(sessionRepository.findByUserNameAndStatus(anyLong(), anySet())).thenReturn(
                 List.of(SessionEntity.builder()
                         .id(3L).date(LocalDate.of(2023, 9, 12))
                         .owner(UserEntity.builder().id(2L).build())
@@ -205,46 +205,38 @@ class SessionServiceTest {
         );
 
         // when
-        final List<Session> results = sessionService.getSessionsByOwner(2L, List.of("ACTIVE", "CLOSED", "COMPLETED"));
+        final List<Session> results = sessionService.getSessionsByUser("andy", List.of("ACTIVE"));
 
         // then
         assertEquals(1, results.size());
         assertEquals(3L, results.get(0).id());
 
-        verify(sessionRepository, times(1)).findByOwnerAndStatus(eq(2L), setStatusCaptor.capture());
-        final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
-        assertEquals(2, paramStatus.size());
-        assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
-        assertTrue(paramStatus.contains(SessionStatus.CLOSED));
-    }
-
-    /**
-     * Given participant ID, when get sessions by participant, return sessions
-     */
-    @Test
-    void givenParticipantId_whenGetSessionsByParticipant_returnSessionsByParticipant() {
-        // given
-        when(sessionRepository.findByParticipantAndStatus(anyLong(), anySet())).thenReturn(
-                List.of(SessionEntity.builder()
-                        .id(3L).date(LocalDate.of(2023, 9, 12))
-                        .owner(UserEntity.builder().id(2L).build())
-                        .participants(Collections.emptyList())
-                        .restaurants(Collections.emptyList())
-                        .status(SessionStatus.ACTIVE)
-                        .build())
-        );
-
-        // when
-        final List<Session> results = sessionService.getSessionsByParticipant(2L, List.of("ACTIVE"));
-
-        // then
-        assertEquals(1, results.size());
-        assertEquals(3L, results.get(0).id());
-
-        verify(sessionRepository, times(1)).findByParticipantAndStatus(eq(2L), setStatusCaptor.capture());
+        verify(userRepository, times(1)).findByUserName("andy");
+        verify(sessionRepository, times(1)).findByUserNameAndStatus(eq(22L), setStatusCaptor.capture());
         final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
         assertEquals(1, paramStatus.size());
         assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
+    }
+
+    /**
+     * Given username, when get sessions by user, return sessions
+     */
+    @Test
+    void givenInvalidUser_whenGetSessionsByUser_returnSessionsByUser() {
+        // given
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+
+        // when
+        try {
+            sessionService.getSessionsByUser("andy", List.of("ACTIVE"));
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("User is not valid", e.getMessage());
+        }
+
+        // then
+        verify(userRepository, times(1)).findByUserName("andy");
+        verifyNoInteractions(sessionRepository);
     }
 
     /**

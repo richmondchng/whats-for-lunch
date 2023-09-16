@@ -142,28 +142,14 @@ class SessionControllerTest {
     }
 
     /**
-     * Given request without owner or participant parameters, when invoke GET /api/v1/sessions, return empty list
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithoutUserIdParam_whenGetSessions_defaultStatus() throws Exception {
-
-        mockMvc.perform(get("/api/v1/sessions"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(0)));
-
-        verifyNoInteractions(sessionService);
-    }
-
-    /**
      * Given request with owner ID parameter, when invoke GET /api/v1/sessions, return collection
      * @throws Exception exception
      */
     @Test
+    @WithMockUser("andy")
     void givenRequestWithOwnerIdParam_whenGetSessions_returnOwnerSessionWithDefaultStatus() throws Exception {
 
-        when(sessionService.getSessionsByOwner(anyLong(), any())).thenReturn(
+        when(sessionService.getSessionsByUser(anyString(), any())).thenReturn(
                 List.of(new Session(99L, LocalDate.of(2023, 9, 12),
                             new Owner(2L, "ed", "Edward"),
                             List.of(new Participant(2L, "ed", "Edward", "PENDING"),
@@ -171,66 +157,15 @@ class SessionControllerTest {
                             Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
         );
 
-        mockMvc.perform(get("/api/v1/sessions?owner=2"))
+        mockMvc.perform(get("/api/v1/sessions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].id", is(99)))
                 .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
 
-        verify(sessionService, times(1)).getSessionsByOwner(2L, List.of("ACTIVE","CLOSED"));
+        verify(sessionService, times(1)).getSessionsByUser("andy", List.of("ACTIVE","CLOSED"));
     }
-
-    /**
-     * Given request with participant ID parameter, when invoke GET /api/v1/sessions, return collection
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithParticipantIdParam_whenGetSessions_returnParticipantSessionWithDefaultStatus() throws Exception {
-
-        when(sessionService.getSessionsByParticipant(anyLong(), any())).thenReturn(
-                List.of(new Session(99L, LocalDate.of(2023, 9, 12),
-                        new Owner(2L, "ed", "Edward"),
-                        List.of(new Participant(2L, "ed", "Edward", "PENDING"),
-                                new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
-        );
-
-        mockMvc.perform(get("/api/v1/sessions?participant=5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].id", is(99)))
-                .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
-
-        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("ACTIVE","CLOSED"));
-    }
-
-    /**
-     * Given request with status parameter, when invoke GET /api/v1/sessions, return collection
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithStatusParam_whenGetSessions_returnOwnerSessionWithSelectedStatus() throws Exception {
-
-        when(sessionService.getSessionsByParticipant(anyLong(), any())).thenReturn(
-                List.of(new Session(99L, LocalDate.of(2023, 9, 12),
-                        new Owner(2L, "ed", "Edward"),
-                        List.of(new Participant(2L, "ed", "Edward", "PENDING"),
-                                new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
-        );
-
-        mockMvc.perform(get("/api/v1/sessions?participant=5&status=CLOSED,DELETED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].id", is(99)))
-                .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
-
-        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("CLOSED", "DELETED"));
-    }
-
 
     /**
      * Given path variable session ID is 0, when invoke GET /api/v1/sessions/{id}, throw error

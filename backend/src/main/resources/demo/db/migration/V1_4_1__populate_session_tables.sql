@@ -35,6 +35,11 @@ SELECT '2023-09-07', u.ID, 'ACTIVE', 0
 FROM users u
 WHERE u.user_name = 'john';
 
+INSERT INTO sessions (session_date, owner_id, status, version)
+SELECT '2023-09-13', u.ID, 'ACTIVE', 0
+FROM users u
+WHERE u.user_name = 'natasha';
+
 -- participants
 
 INSERT INTO session_participants (session_id, user_id, status, version) 
@@ -106,3 +111,18 @@ INSERT INTO session_participants (session_id, user_id, status, version)
 SELECT s.ID, (SELECT id FROM users WHERE user_name='pam'), 'PENDING', 1
 FROM sessions s, users u
 WHERE s.owner_id = u.id AND s.session_date = '2023-09-07' AND u.user_name='natasha';
+
+INSERT INTO session_participants (session_id, user_id, status, version)
+SELECT s.ID, (SELECT id FROM users WHERE user_name='natasha'), 'PENDING', 1
+FROM sessions s, users u
+WHERE s.owner_id = u.id AND s.session_date = '2023-09-13' AND u.user_name='natasha';
+
+INSERT INTO session_participants (session_id, user_id, status, version)
+SELECT s.ID, (SELECT id FROM users WHERE user_name='john'), 'PENDING', 1
+FROM sessions s, users u
+WHERE s.owner_id = u.id AND s.session_date = '2023-09-13' AND u.user_name='natasha';
+
+INSERT INTO session_participants (session_id, user_id, status, version)
+SELECT s.ID, (SELECT id FROM users WHERE user_name='victor'), 'PENDING', 1
+FROM sessions s, users u
+WHERE s.owner_id = u.id AND s.session_date = '2023-09-13' AND u.user_name='natasha';

@@ -13,22 +13,6 @@ import java.util.Set;
  */
 public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
 
-    /**
-     * Find sessions by owner, and filtered by status
-     * @param ownerId owner ID
-     * @param status set of status to filter
-     * @return list of sessions
-     */
-    @Query("SELECT s FROM sessions s WHERE s.owner.id=:ownerId AND s.status IN (:status)")
-    List<SessionEntity> findByOwnerAndStatus(final long ownerId, final Set<SessionStatus> status);
-
-    /**
-     * Find sessions by participant, and filtered by status
-     * @param participantId participant ID
-     * @param status set of status to filter
-     * @return list of sessions
-     */
-    @Query("SELECT s FROM sessions s, session_participants p WHERE s.id = p.session.id AND p.user.id=:participantId AND s.status IN (:status)")
-    List<SessionEntity> findByParticipantAndStatus(final long participantId, final Set<SessionStatus> status);
-
+    @Query("SELECT s FROM sessions s, session_participants p WHERE s.id = p.session.id AND (s.owner.id=:userId OR p.user.id=:userId) AND s.status IN (:status) GROUP BY s.ID")
+    List<SessionEntity> findByUserNameAndStatus(final long userId, final Set<SessionStatus> status);
 }

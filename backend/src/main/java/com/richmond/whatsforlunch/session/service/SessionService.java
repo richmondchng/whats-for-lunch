@@ -82,28 +82,6 @@ public class SessionService {
         return ServiceBeanMapper.mapToBean(session);
     }
 
-    /**
-     * Get collection of sessions by owner and status
-     * @param ownerId owner ID
-     * @param status array of status
-     * @return collection of session
-     */
-    public List<Session> getSessionsByOwner(final long ownerId, final List<String> status) {
-        return sessionRepository.findByOwnerAndStatus(ownerId, getStatusObject(status))
-                .stream().map(ServiceBeanMapper::mapToBean).toList();
-    }
-
-    /**
-     * Get collection of sessions by participant and status
-     * @param participantId participant ID
-     * @param status array of status
-     * @return collection of session
-     */
-    public List<Session> getSessionsByParticipant(final long participantId, final List<String> status) {
-        return sessionRepository.findByParticipantAndStatus(participantId, getStatusObject(status))
-                .stream().map(ServiceBeanMapper::mapToBean).toList();
-    }
-
     private Set<SessionStatus> getStatusObject(final List<String> status) {
         return status.stream().map(SessionStatus::find).filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
@@ -141,5 +119,12 @@ public class SessionService {
         sessionRepository.saveAndFlush(session);
     }
 
+    public List<Session> getSessionsByUser(final String name, final List<String> status) {
+        // get user
+        final UserEntity user = userRepository.findByUserName(name)
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_USER_ID_NOT_FOUND));
 
+        // get sessions by user id
+        return sessionRepository.findByUserNameAndStatus(user.getId(), getStatusObject(status)).stream().map(ServiceBeanMapper::mapToBean).toList();
+    }
 }

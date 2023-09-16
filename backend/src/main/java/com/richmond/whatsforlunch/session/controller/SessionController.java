@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,24 +58,15 @@ public class SessionController {
     /**
      * Get sessions.
      * @param status list of status to returned
-     * @param owner filtered by owner ID
-     * @param participant filtered by participant ID
+     * @param principal user
      * @return list of sessions
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> getSessions(
             @RequestParam(defaultValue = "ACTIVE,CLOSED") final List<String> status,
-            @RequestParam(required = false) final Long owner,
-            @RequestParam(required = false) final Long participant) {
+            final Principal principal) {
 
-        final List<Session> results;
-        if(owner != null) {
-            results = sessionService.getSessionsByOwner(owner, status);
-        } else if(participant != null) {
-            results = sessionService.getSessionsByParticipant(participant, status);
-        } else {
-            results = new ArrayList<>(0);
-        }
+        final List<Session> results = sessionService.getSessionsByUser(principal.getName(), status);
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(results)));
     }
 

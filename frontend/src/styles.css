@@ -1,14 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
-#root {
+/* #root {
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
-}
+} */
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     line-height: 1.5;
-    font-size: 14pt;
+    /* font-size: 14pt; */
   
     color-scheme: light;
     color: #242424;
@@ -30,4 +30,46 @@ body {
     border: 1px solid slategrey;
     padding: 30px;
     border-radius: 5px;
+}
+
+.form-control {
+    margin: 10px 0;
+}
+
+.form-control label {
+    font-weight: bold;
+    margin-top: 0.5em;
+    display: block;
+}
+
+.form-control input {
+    width: 100%;
+    /* height: 40px;
+    margin: 5px;
+    padding: 3px 7px; */
+
+    padding: 0.5em; 
+    height: 2em;
+    /* margin-right: 0.5em; */
+    border-width: 1px 1px 1px 1px;
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.form-control-btn {
+    float: right;
+}
+
+.btn {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+    font-family: inherit;
 }

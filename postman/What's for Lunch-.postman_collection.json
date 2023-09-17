@@ -10,8 +10,66 @@
 			"name": "Users",
 			"item": [
 				{
+					"name": "Get token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"access_token\", jsonData.data[0].accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "natasha",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/tokens",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get all users",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -28,6 +86,67 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get user by username",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/users/john",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"john"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get current user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{servername}}/api/v1/currentuser",
+							"protocol": "http",
+							"host": [
+								"{{servername}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"currentuser"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -37,11 +156,21 @@
 				{
 					"name": "Create new session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"date\": \"2023-09-13\",\r\n    \"owner\": 2,\r\n    \"participants\": [2, 3]\r\n}",
+							"raw": "{\r\n    \"date\": \"2023-09-13\",\r\n    \"participants\": [5, 3, 2]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -64,42 +193,22 @@
 					"response": []
 				},
 				{
-					"name": "Get all sessions by owner",
+					"name": "Get sessions by user",
 					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{servername}}/api/v1/sessions?owner=5&status=OPEN,CLOSED",
-							"protocol": "http",
-							"host": [
-								"{{servername}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"sessions"
-							],
-							"query": [
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "owner",
-									"value": "5"
-								},
-								{
-									"key": "status",
-									"value": "OPEN,CLOSED"
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
 								}
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all sessions by participant",
-					"request": {
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{servername}}/api/v1/sessions?participant=5",
+							"raw": "http://{{servername}}/api/v1/sessions",
 							"protocol": "http",
 							"host": [
 								"{{servername}}"
@@ -108,12 +217,6 @@
 								"api",
 								"v1",
 								"sessions"
-							],
-							"query": [
-								{
-									"key": "participant",
-									"value": "5"
-								}
 							]
 						}
 					},
@@ -122,11 +225,21 @@
 				{
 					"name": "Add new restaurant to session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\": 4,\r\n    \"restaurant\": \"OutThere steak house\",\r\n    \"description\": \"Steaks for cheap!\"\r\n}",
+							"raw": "{\r\n    \"restaurant\": \"OutThere steak house\",\r\n    \"description\": \"Steaks for cheap!\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -153,6 +266,16 @@
 				{
 					"name": "Add new participant to session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -184,10 +307,20 @@
 				{
 					"name": "Get session by ID",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{servername}}/api/v1/sessions/6",
+							"raw": "http://{{servername}}/api/v1/sessions/3",
 							"protocol": "http",
 							"host": [
 								"{{servername}}"
@@ -196,7 +329,7 @@
 								"api",
 								"v1",
 								"sessions",
-								"6"
+								"3"
 							]
 						}
 					},
@@ -205,6 +338,16 @@
 				{
 					"name": "Delete restaurant from session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -228,6 +371,16 @@
 				{
 					"name": "Delete participant from session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -251,6 +404,16 @@
 				{
 					"name": "Delete session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -272,6 +435,16 @@
 				{
 					"name": "Close session",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [],
 						"body": {

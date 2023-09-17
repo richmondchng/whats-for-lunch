@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { ResponseSessions, SessionBody, ResponseDeleteSession, ResponseAddRestaurant, ResponseSelectRestaurant } from '../interfaces/ResponseDetails';
 import { Restaruant } from '../interfaces/Restaurant';
 import { environment } from 'src/environments/environment';
@@ -24,7 +24,8 @@ export class SessionsService {
       .pipe(
         map((response:ResponseSessions) => {
           return response.data;
-        })
+        }),
+        catchError(this.handleError)
       );
   }
 
@@ -39,7 +40,8 @@ export class SessionsService {
     .pipe(
       map((response:ResponseSessions) => {
         return response.data[0];
-      })
+      }),
+      catchError(this.handleError)
     );
   }
 
@@ -49,7 +51,8 @@ export class SessionsService {
       'Content-Type' : 'application/json'
     });
     const url = `${environment.apiUrl}/sessions/${session.id}`;
-    return this.http.delete<ResponseDeleteSession>(url, {headers: headers});
+    return this.http.delete<ResponseDeleteSession>(url, {headers: headers}).pipe(
+      catchError(this.handleError));
   }
 
   addRestaurantToSession(sessionId:number, restaurant: Restaruant) : Observable<ResponseAddRestaurant> {
@@ -60,7 +63,8 @@ export class SessionsService {
     const url = `${environment.apiUrl}/sessions/${sessionId}/restaurants`;
     return this.http.post<ResponseAddRestaurant>(url, 
       { restaurant: restaurant.name, description: restaurant.description},
-      { headers: headers });
+      { headers: headers }).pipe(
+        catchError(this.handleError));
   }
 
   selectRestaurantForSession(sessionId: number) {
@@ -70,6 +74,21 @@ export class SessionsService {
     });
     const url = `${environment.apiUrl}/sessions/${sessionId}`;
     return this.http.patch<ResponseSelectRestaurant>(url, 
-      { strategy: "RANDOM" }, { headers: headers });
+      { strategy: "RANDOM" }, { headers: headers }).pipe(
+        catchError(this.handleError));
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      console.error(
+        `Backend returned code ${error.status}, body was: `, error.error);
+    }
+    // Return an observable with a user-facing error message.
+    return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 }

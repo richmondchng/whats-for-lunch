@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Credentials } from '../interfaces/Credentials';
 import { Me } from '../interfaces/Me';
-import { Observable, of } from 'rxjs';
-import { concatMap} from 'rxjs/operators'
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, concatMap} from 'rxjs/operators'
 import { ResponseTokens, ResponseUsers, UserBody } from '../interfaces/ResponseDetails';
 import { environment } from 'src/environments/environment';
 
@@ -41,7 +41,22 @@ export class AuthenticationService {
           };
           localStorage.setItem("me", JSON.stringify(me));
           return of(true);
-        })
+        }),
+        catchError(this.handleError)
       );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      console.error(
+        `Backend returned code ${error.status}, body was: `, error.error);
+    }
+    // Return an observable with a user-facing error message.
+    return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 }

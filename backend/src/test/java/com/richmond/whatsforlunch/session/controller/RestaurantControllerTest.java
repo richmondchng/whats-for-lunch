@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -39,36 +40,18 @@ class RestaurantControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser("steven")
     void givenRequestBodyIsValid_whenAddRestaurant_returnSuccessStatus() throws Exception {
 
-        final String content = "{\"userId\":\"88\", \"restaurant\":\"Kenny Fried Chicken\", \"description\": \"Good value meals\"}";
+        final String content = "{\"restaurant\":\"Kenny Fried Chicken\", \"description\": \"Good value meals\"}";
         mockMvc.perform(post("/api/v1/sessions/2/restaurants").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].status", is("Success")));
 
-        verify(restaurantService, times(1)).addRestaurantToSession(2L, 88L,
+        verify(restaurantService, times(1)).addRestaurantToSession(2L, "steven",
                 "Kenny Fried Chicken", "Good value meals");
-    }
-
-    /**
-     * Given request body does not contain mandatory user Id field, when invoke POST /api/v1/sessions/{sessionId}/restaurants, fail and throw error
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestBodyWithoutUserId_whenAddRestaurant_returnError() throws Exception {
-
-        final String content = "{\"restaurant\":\"Kenny Fried Chicken\", \"description\": \"Good value meals\"}";
-        mockMvc.perform(post("/api/v1/sessions/2/restaurants").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is(400)))
-                .andExpect(jsonPath("$.error", is("Bad Request")))
-                .andExpect(jsonPath("$.message", is("User ID is mandatory")))
-                .andExpect(jsonPath("$.path", is("/api/v1/sessions/2/restaurants")));
-
-        verifyNoInteractions(restaurantService);
     }
 
     /**
@@ -76,6 +59,7 @@ class RestaurantControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser("steven")
     void givenRequestBodyWithoutRestaurant_whenAddRestaurant_returnError() throws Exception {
 
         final String content = "{\"userId\":\"88\"}";

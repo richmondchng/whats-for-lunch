@@ -60,7 +60,7 @@ class RestaurantServiceTest {
         final String nameMoreThan255 = "McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken McFly Chicken";
         // when
         try {
-            restaurantService.addRestaurantToSession(15L, 3L, nameMoreThan255, "Yummy fried chicken");
+            restaurantService.addRestaurantToSession(15L, "ed", nameMoreThan255, "Yummy fried chicken");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
             assertEquals("Restaurant name is too long (max 255 character)", e.getMessage());
@@ -78,7 +78,7 @@ class RestaurantServiceTest {
         final String descMoreThan255 = "Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken Yummy fried chicken";
         // when
         try {
-            restaurantService.addRestaurantToSession(15L, 3L, "McFly Chicken", descMoreThan255);
+            restaurantService.addRestaurantToSession(15L, "ed", "McFly Chicken", descMoreThan255);
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
             assertEquals("Description is too long (max 255 character)", e.getMessage());
@@ -98,7 +98,7 @@ class RestaurantServiceTest {
 
         // when
         try {
-            restaurantService.addRestaurantToSession(99999L, 3L, "McFly Chicken",
+            restaurantService.addRestaurantToSession(99999L, "ed", "McFly Chicken",
                     "Yummy fried chicken");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
@@ -127,7 +127,7 @@ class RestaurantServiceTest {
 
         // when
         try {
-            restaurantService.addRestaurantToSession(15L, 4L, "McFly Chicken",
+            restaurantService.addRestaurantToSession(15L, "ed", "McFly Chicken",
                     "Yummy fried chicken");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
@@ -161,7 +161,7 @@ class RestaurantServiceTest {
 
         // when
         try {
-            restaurantService.addRestaurantToSession(15L, 4L, "McFly Chicken",
+            restaurantService.addRestaurantToSession(15L, "steven", "McFly Chicken",
                     "Yummy fried chicken");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {

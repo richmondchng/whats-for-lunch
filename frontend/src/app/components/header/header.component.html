@@ -7,6 +7,7 @@
     </h1>
     <div *ngIf="me">Hello {{ me.displayName }} <button class="btn" (click)="onLogout()">Logout</button></div>
 </header>
+<hr/>
 <div class="message-box"
   *ngIf="showMessage" 
   [ngClass]="{ 'message-box-error' : (message.category === 'ERROR') }">

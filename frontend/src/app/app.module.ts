@@ -11,13 +11,13 @@ import { HomeComponent } from './components/home/home.component';
 import { SessionOverviewCardComponent } from './components/session-overview-card/session-overview-card.component';
 import { SessionCreateFormComponent } from './components/session-create-form/session-create-form.component';
 import { SessionDetailsComponent } from './components/session-details/session-details.component';
-// import { MatDatepickerModule } from '@angular/material/datepicker';
-// import { MatFormFieldModule } from '@angular/material/form-field';
-// import { MatNativeDateModule } from '@angular/material/core';
-// import { MatInputModule } from '@angular/material/input';
-// import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
-// import {MatSelectModule} from '@angular/material/select';
-// import {MatFormFieldModule} from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatSelectModule} from '@angular/material/select';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatNativeDateModule} from '@angular/material/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core'
 
 @NgModule({
   declarations: [
@@ -34,16 +34,18 @@ import { SessionDetailsComponent } from './components/session-details/session-de
     AppRoutingModule,
     FontAwesomeModule,
     FormsModule,
-    HttpClientModule
-    // MatDatepickerModule,
-    // MatNativeDateModule,
-    // MatInputModule,
-    // ReactiveFormsModule,
-    // MatFormFieldModule,
-    // MatSelectModule,
-    // NoopAnimationsModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

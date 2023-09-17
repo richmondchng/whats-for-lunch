@@ -5,25 +5,30 @@ interface ResponseSessions {
 interface SessionBody {
     id: number;
     date: Date;
-    owner: {
-        id: number;
-        userName: string;
-        displayName: string;
-    };
-    participants: [{
-        id: number;
-        userName: string;
-        displayName: string;
-        status: string;
-    }],
-    restaurants: [{
-        id: number;
-        restaurantName: string;
-        description: string;
-        addedBy: number,
-        status: string;
-    }],
-    selectedRestaurant?: string;
+    owner: OwnerBody;
+    participants: ParticipantBody[],
+    restaurants: RestaurantBody[],
+    selectedRestaurant?: number;
+    status: string;
+}
+
+interface OwnerBody {
+    id: number;
+    userName: string;
+    displayName: string;
+}
+
+interface ParticipantBody {
+    id: number;
+    userName: string;
+    displayName: string;
+    status: string;
+}
+interface RestaurantBody {
+    id: number;
+    restaurantName: string;
+    description: string;
+    addedBy: number,
     status: string;
 }
 
@@ -54,12 +59,6 @@ interface ResponseDeleteSession {
     }]
 }
 
-// interface DeleteSessionBody {
-//     sessionId: number;
-//     action: string;
-//     status: string;
-// }
-
 interface ResponseAddRestaurant {
     data: [{
         status: string;
@@ -67,6 +66,7 @@ interface ResponseAddRestaurant {
 }
 
 export {
-    ResponseSessions, SessionBody, ResponseTokens, TokenBody, ResponseUsers, UserBody,
+    ResponseSessions, SessionBody, OwnerBody, ParticipantBody, RestaurantBody,
+    ResponseTokens, TokenBody, ResponseUsers, UserBody,
     ResponseDeleteSession, ResponseAddRestaurant
 }

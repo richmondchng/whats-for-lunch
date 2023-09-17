@@ -1,7 +1,15 @@
 .session-dashboard {  
     display: flexbox;
 }
-  
+
+.session-dashboard h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2em;
+    margin-top: 0;
+}
+
 .session-group {
     list-style-type: none;
     padding: 0;
@@ -24,6 +32,7 @@
 .session-group-item h2 {
     padding-top: 0;
     margin-top: 0;
+    margin-bottom: 0.5em;
 }
   
 .session-list {

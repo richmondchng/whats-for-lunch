@@ -81,3 +81,14 @@ body {
 .btn:active {
     transform: scale(0.98);
 }
+
+a,
+a:visited,
+a:hover {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #125699;
+}

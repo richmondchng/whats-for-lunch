@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { SessionsService } from 'src/app/services/sessions.service';
 import { SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { Restaruant } from 'src/app/interfaces/Restaurant';
+import { concatMap} from 'rxjs/operators';
+import { Me } from 'src/app/interfaces/Me';
 
 @Component({
   selector: 'app-session-details',
@@ -12,34 +13,51 @@ import { Restaruant } from 'src/app/interfaces/Restaurant';
 })
 export class SessionDetailsComponent implements OnInit {
 
-  session! : SessionBody;
+  session : SessionBody = {
+    id: 0,
+    date: new Date(),
+    owner: {id: 0, userName: "", displayName: ""},
+    participants: [],
+    restaurants: [],
+    selectedRestaurant: 0,
+    status: ""
+  };
   restaurant: Restaruant = {name: "", description: ""};
+  showSelectRestaurantButton: boolean = false;
+  showAddRestaurantForm: boolean = false;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient,
-     private sessionService: SessionsService) {}
+  constructor(private route: ActivatedRoute, private sessionService: SessionsService) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((param:Params) => {
-      //console.log(param['id']);
       const sessionId = param['sessionid'];
-      this.loadSessionDetails(sessionId);
+      this.sessionService.getSession(sessionId as number).subscribe((result) => {
+        this.session = result;
+        if(this.session.status === "ACTIVE") {
+          const obj = localStorage.getItem("me");
+          if(obj) {
+            const me: Me = JSON.parse(obj);
+            this.showSelectRestaurantButton = (this.session.owner.userName === me.userName);
+          }
+          this.showAddRestaurantForm = true;
+        }
+      })
     });
   }
 
   loadSessionDetails(sessionId:number) {
-    this.sessionService.getSession(sessionId as number).subscribe((result) => this.session = result);
+    return this.sessionService.getSession(sessionId as number).subscribe((result) => {
+      this.session = result;
+    });
   }
 
   addRestaurant() {
-    console.log("click!");
     this.sessionService.addRestaurantToSession(this.session.id, this.restaurant)
-    .subscribe(() => (this.loadSessionDetails(this.session.id)));
-    
-    
-    // .authenticate(this.credentials).subscribe((response:boolean) => {
-    //   console.log("got token " + response);
-    //   this.router.navigateByUrl('/home');
-    // });
+    .subscribe(() => {
+      this.loadSessionDetails(this.session.id);
+      this.restaurant.name = "";
+      this.restaurant.description = "";
+    });
   }
 
 }

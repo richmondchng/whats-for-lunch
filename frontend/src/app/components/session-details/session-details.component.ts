@@ -7,6 +7,8 @@ import { concatMap} from 'rxjs/operators';
 import { Me } from 'src/app/interfaces/Me';
 import { ResponseSelectRestaurant } from 'src/app/interfaces/ResponseDetails';
 import { faCalendarDay, faUtensils, faUserGroup, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-session-details',
@@ -32,28 +34,40 @@ export class SessionDetailsComponent implements OnInit {
   faUtensils = faUtensils;
   faUserGroup = faUserGroup;
 
-  constructor(private route: ActivatedRoute, private sessionService: SessionsService) {}
+  constructor(private route: ActivatedRoute, private sessionService: SessionsService, private messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((param:Params) => {
-      const sessionId = param['sessionid'];
-      this.sessionService.getSession(sessionId as number).subscribe((result) => {
-        this.session = result;
-        if(this.session.status === "ACTIVE") {
-          const obj = localStorage.getItem("me");
-          if(obj) {
-            const me: Me = JSON.parse(obj);
-            this.showSelectRestaurantButton = (this.session.owner.userName === me.userName);
+    this.route.queryParams.subscribe({
+      next: (param:Params) => {
+        const sessionId = param['sessionid'];
+        this.sessionService.getSession(sessionId as number).subscribe({
+          next: (result) => {
+            this.session = result;
+            if(this.session.status === "ACTIVE") {
+              const obj = localStorage.getItem("me");
+              if(obj) {
+                const me: Me = JSON.parse(obj);
+                this.showSelectRestaurantButton = (this.session.owner.userName === me.userName);
+              }
+              this.showAddRestaurantForm = true;
+            }
+          },
+          error: (err) => {
+            this.publishError(err);
           }
-          this.showAddRestaurantForm = true;
-        }
-      })
+        });
+      },
+      error: (err) => this.publishError(err)
     });
+    
   }
 
   loadSessionDetails(sessionId:number) {
-    return this.sessionService.getSession(sessionId as number).subscribe((result) => {
-      this.session = result;
+    return this.sessionService.getSession(sessionId as number).subscribe({
+      next: (result) => {
+        this.session = result;
+      },
+      error: (err) => this.publishError(err)
     });
   }
 
@@ -63,19 +77,41 @@ export class SessionDetailsComponent implements OnInit {
       return;
     }
     this.sessionService.addRestaurantToSession(this.session.id, this.restaurant)
-    .subscribe(() => {
-      this.loadSessionDetails(this.session.id);
-      this.restaurant.name = "";
-      this.restaurant.description = "";
+    .subscribe({
+      next: () => {
+        this.loadSessionDetails(this.session.id);
+        this.restaurant.name = "";
+        this.restaurant.description = "";
+      },
+      error: (err) => this.publishError(err)
     });
   }
 
   selectRestaurant() {
-    this.sessionService.selectRestaurantForSession(this.session.id).subscribe(
-      (response: ResponseSelectRestaurant)=>{
+    this.sessionService.selectRestaurantForSession(this.session.id).subscribe({
+      next: (response: ResponseSelectRestaurant)=>{
         this.showSelectRestaurantButton = false;
         this.showAddRestaurantForm = false;
-        console.log("Selected " + response.data[0].restaurantName);
+        // update UI
+        this.session.selectedRestaurant = response.data[0].restaurantId;
+        // post message
+        const message : DisplayMessage = {
+          message: `Decided! We are going to  ${response.data[0].restaurantName}`,
+          category: "INFO"
+        }
+        this.messageService.addMessage(message);
+      },
+      error: (err) => this.publishError(err)
     });
   }
+
+  publishError(err: Error) {
+    console.debug("Caught error " + err);
+    const message : DisplayMessage = {
+      message: err.message,
+      category: "ERROR"
+    }
+    this.messageService.addMessage(message);
+  }
+
 }

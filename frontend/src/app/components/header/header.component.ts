@@ -34,5 +34,7 @@ export class HeaderComponent {
 
   onCloseMessage() {
     this.showMessage = false;
+    this.message.category = 'INFO';
+    this.message.message = '';
   }
 }

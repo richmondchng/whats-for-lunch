@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Me } from 'src/app/interfaces/Me';
 import { SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-home',
@@ -15,13 +17,14 @@ export class HomeComponent implements OnInit {
   faTimes = faTimes;
   sessions: SessionBody[] = [];
 
-  constructor(private sessionsService: SessionsService, private router: Router) {}
+  constructor(private sessionsService: SessionsService, private messageService: MessageService) {}
 
   ngOnInit(): void {
-    this.sessionsService.getSessionForUser().subscribe(
+    this.sessionsService.getSessionForUser().subscribe({
       // sort descending
-      (sessions) => (this.sessions = sessions.sort((a, b) => a.date >= b.date ? -1 : 1))
-    );
+      next: (sessions) => (this.sessions = sessions.sort((a, b) => a.date >= b.date ? -1 : 1)),
+      error: (err) => this.publishError(err)
+    });
   }
 
   findActiveSessions(data: SessionBody[]) : SessionBody[] {
@@ -35,6 +38,17 @@ export class HomeComponent implements OnInit {
   deleteSession(session: SessionBody) {
     this.sessionsService.deleteSession(session)
       // on success, refresh records
-      .subscribe(() => (this.sessions = this.sessions.filter((s) => s.id !== session.id)));
+      .subscribe({
+        next: () => (this.sessions = this.sessions.filter((s) => s.id !== session.id)),
+        error: (err) => this.publishError(err)
+      });
+  }
+
+  publishError(err: Error) {
+    const message : DisplayMessage = {
+      message: err.message,
+      category: "ERROR"
+    }
+    this.messageService.addMessage(message);
   }
 }

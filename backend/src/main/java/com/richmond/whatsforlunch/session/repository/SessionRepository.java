@@ -13,6 +13,6 @@ import java.util.Set;
  */
 public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
 
-    @Query("SELECT s FROM sessions s, session_participants p WHERE s.id = p.session.id AND (s.owner.id=:userId OR p.user.id=:userId) AND s.status IN (:status) GROUP BY s.ID")
+    @Query("SELECT s FROM sessions s LEFT JOIN session_participants p ON s.id = p.session.id WHERE (s.owner.id=:userId OR (p.user.id IS NOT NULL AND p.user.id=:userId)) AND s.status IN (:status) GROUP BY s.ID")
     List<SessionEntity> findByUserNameAndStatus(final long userId, final Set<SessionStatus> status);
 }

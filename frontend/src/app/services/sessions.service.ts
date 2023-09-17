@@ -5,6 +5,8 @@ import { map, catchError } from 'rxjs/operators';
 import { ResponseSessions, SessionBody, ResponseDeleteSession, ResponseAddRestaurant, ResponseSelectRestaurant } from '../interfaces/ResponseDetails';
 import { Restaruant } from '../interfaces/Restaurant';
 import { environment } from 'src/environments/environment';
+import { DatePipe } from '@angular/common';
+import { Session } from '../interfaces/Session';
 
 @Injectable({
   providedIn: 'root'
@@ -78,6 +80,25 @@ export class SessionsService {
         catchError(this.handleError));
   }
 
+  createSession(session: Session) : Observable<ResponseSessions> {
+    const datepipe = new DatePipe('en-UK');
+    const formattedDate = datepipe.transform(session.date, 'yyyy-MM-dd');
+
+    const headers = new HttpHeaders({
+      'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+      'Content-Type' : 'application/json'
+    });
+    const url = `${environment.apiUrl}/sessions`;
+    return this.http.post<any>(url, 
+      {
+        date: formattedDate,
+        participants: session.participants
+      },
+      { headers: headers }).pipe(
+        catchError(this.handleError)
+      );
+  }
+
   private handleError(error: HttpErrorResponse) {
     let msg = 'Something bad happened; please try again later.';
     if (error.status === 0) {
@@ -87,8 +108,8 @@ export class SessionsService {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong.
       console.error(`Backend returned code ${error.status}, body was: `, error.error);
-      if(error.status === 401) {
-        msg = 'Token has expired, please log in again';
+      if(error.error && error.error.message) {
+        msg = "Error: " + error.error.message;
       }
     }
     // Return an observable with a user-facing error message.

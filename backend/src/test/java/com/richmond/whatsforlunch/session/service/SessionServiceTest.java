@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
@@ -80,18 +81,19 @@ class SessionServiceTest {
     @Test
     void givenOwnerIdIsNotValid_whenCreateNewSession_throwException() {
         // given
-        when(userRepository.findAllById(anyCollection())).thenReturn(Collections.emptyList());
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
 
         // when
         try {
-            sessionService.createNewSession(LocalDate.of(2023, 9, 13), 2L, List.of(2L, 3L));
+            sessionService.createNewSession(LocalDate.of(2023, 9, 13), "ed", List.of(2L, 3L));
             fail("Expect exception to be thrown");
         } catch(RuntimeException ex) {
             assertEquals("Owner is not found", ex.getMessage());
         }
 
         // then
-        verify(userRepository, times(1)).findAllById(anyCollection());
+        verify(userRepository, times(1)).findByUserName(eq("ed"));
+        verify(userRepository, times(0)).findAllById(anyCollection());
         verifyNoInteractions(sessionRepository);
     }
 
@@ -101,19 +103,20 @@ class SessionServiceTest {
     @Test
     void givenParticipantIdIsNotValid_whenCreateNewSession_throwException() {
         // given
-        when(userRepository.findAllById(anyCollection())).thenReturn(List.of(
-                UserEntity.builder().id(2L).userName("ed").build()
-        ));
+        final UserEntity u1 = UserEntity.builder().id(2L).userName("ed").build();
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(u1));
+        when(userRepository.findAllById(anyCollection())).thenReturn(List.of(u1));
 
         // when
         try {
-            sessionService.createNewSession(LocalDate.of(2023, 9, 13), 2L, List.of(2L, 3L));
+            sessionService.createNewSession(LocalDate.of(2023, 9, 13), "ed", List.of(2L, 3L));
             fail("Expect exception to be thrown");
         } catch(RuntimeException ex) {
             assertEquals("Participant is not found", ex.getMessage());
         }
 
         // then
+        verify(userRepository, times(1)).findByUserName(eq("ed"));
         verify(userRepository, times(1)).findAllById(anyCollection());
         verifyNoInteractions(sessionRepository);
     }
@@ -124,10 +127,10 @@ class SessionServiceTest {
     @Test
     void givenValidInput_whenCreateNewSession_createAndReturnNewSession() {
         // given
-        when(userRepository.findAllById(anyCollection())).thenReturn(List.of(
-                UserEntity.builder().id(2L).userName("ed").firstName("Edward").build(),
-                UserEntity.builder().id(3L).userName("betty").firstName("Betty").build()
-        ));
+        final UserEntity u1 = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final UserEntity u2 = UserEntity.builder().id(3L).userName("betty").firstName("Betty").build();
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(u1));
+        when(userRepository.findAllById(anyCollection())).thenReturn(List.of(u1, u2));
         doAnswer(invocationOnMock -> {
             final SessionEntity param = invocationOnMock.getArgument(0, SessionEntity.class);
             param.setId(998L);
@@ -135,7 +138,7 @@ class SessionServiceTest {
         }).when(sessionRepository).saveAndFlush(any());
 
         // when
-        final Session result = sessionService.createNewSession(LocalDate.of(2023, 9, 13), 2L, List.of(2L, 3L));
+        final Session result = sessionService.createNewSession(LocalDate.of(2023, 9, 13), "ed", List.of(2L, 3L));
 
         // then
         assertEquals(998L, result.id());
@@ -162,6 +165,7 @@ class SessionServiceTest {
 
         assertFalse(itr.hasNext());
 
+        verify(userRepository, times(1)).findByUserName(eq("ed"));
         verify(userRepository, times(1)).findAllById(anyCollection());
         final ArgumentCaptor<SessionEntity> argumentCaptor = ArgumentCaptor.forClass(SessionEntity.class);
         verify(sessionRepository, times(1)).saveAndFlush(argumentCaptor.capture());
@@ -183,14 +187,14 @@ class SessionServiceTest {
 
         assertFalse(itrE.hasNext());
     }
-
     /**
-     * Given owner ID, when get sessions by owner, return sessions
+     * Given username, when get sessions by user, return sessions
      */
     @Test
-    void givenOwnerId_whenGetSessionsByOwner_returnSessionsByOwner() {
+    void givenUsername_whenGetSessionsByUser_returnSessionsByUser() {
         // given
-        when(sessionRepository.findByOwnerAndStatus(anyLong(), anySet())).thenReturn(
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(UserEntity.builder().id(22L).build()));
+        when(sessionRepository.findByUserNameAndStatus(anyLong(), anySet())).thenReturn(
                 List.of(SessionEntity.builder()
                         .id(3L).date(LocalDate.of(2023, 9, 12))
                         .owner(UserEntity.builder().id(2L).build())
@@ -201,46 +205,38 @@ class SessionServiceTest {
         );
 
         // when
-        final List<Session> results = sessionService.getSessionsByOwner(2L, List.of("ACTIVE", "CLOSED", "COMPLETED"));
+        final List<Session> results = sessionService.getSessionsByUser("andy", List.of("ACTIVE"));
 
         // then
         assertEquals(1, results.size());
         assertEquals(3L, results.get(0).id());
 
-        verify(sessionRepository, times(1)).findByOwnerAndStatus(eq(2L), setStatusCaptor.capture());
-        final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
-        assertEquals(2, paramStatus.size());
-        assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
-        assertTrue(paramStatus.contains(SessionStatus.CLOSED));
-    }
-
-    /**
-     * Given participant ID, when get sessions by participant, return sessions
-     */
-    @Test
-    void givenParticipantId_whenGetSessionsByParticipant_returnSessionsByParticipant() {
-        // given
-        when(sessionRepository.findByParticipantAndStatus(anyLong(), anySet())).thenReturn(
-                List.of(SessionEntity.builder()
-                        .id(3L).date(LocalDate.of(2023, 9, 12))
-                        .owner(UserEntity.builder().id(2L).build())
-                        .participants(Collections.emptyList())
-                        .restaurants(Collections.emptyList())
-                        .status(SessionStatus.ACTIVE)
-                        .build())
-        );
-
-        // when
-        final List<Session> results = sessionService.getSessionsByParticipant(2L, List.of("ACTIVE"));
-
-        // then
-        assertEquals(1, results.size());
-        assertEquals(3L, results.get(0).id());
-
-        verify(sessionRepository, times(1)).findByParticipantAndStatus(eq(2L), setStatusCaptor.capture());
+        verify(userRepository, times(1)).findByUserName("andy");
+        verify(sessionRepository, times(1)).findByUserNameAndStatus(eq(22L), setStatusCaptor.capture());
         final Set<SessionStatus> paramStatus = setStatusCaptor.getValue();
         assertEquals(1, paramStatus.size());
         assertTrue(paramStatus.contains(SessionStatus.ACTIVE));
+    }
+
+    /**
+     * Given username, when get sessions by user, return sessions
+     */
+    @Test
+    void givenInvalidUser_whenGetSessionsByUser_returnSessionsByUser() {
+        // given
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+
+        // when
+        try {
+            sessionService.getSessionsByUser("andy", List.of("ACTIVE"));
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("User is not valid", e.getMessage());
+        }
+
+        // then
+        verify(userRepository, times(1)).findByUserName("andy");
+        verifyNoInteractions(sessionRepository);
     }
 
     /**
@@ -326,7 +322,7 @@ class SessionServiceTest {
 
         // when
         try {
-            sessionService.deleteSession(99999L);
+            sessionService.deleteSession(99999L, "steven");
             fail("Expect exception to be thrown");
         } catch(RuntimeException e) {
             assertEquals("Session ID is invalid", e.getMessage());
@@ -334,6 +330,33 @@ class SessionServiceTest {
 
         // verify
         verify(sessionRepository, times(1)).findById(eq(99999L));
+        verify(sessionRepository, times(0)).saveAndFlush(any());
+    }
+
+    /**
+     * Given current user is not owner, when deleteSession, throw exception
+     */
+    @Test
+    void givenNotOwner_whenDeleteSession_throwException() {
+        // given
+        final UserEntity owner = UserEntity.builder().id(2L).userName("ed").firstName("Edward").build();
+        final SessionEntity session = SessionEntity.builder()
+                .id(15L).date(LocalDate.of(2023, 9, 13))
+                // session is closed
+                .version(0).owner(owner).status(SessionStatus.ACTIVE)
+                .build();
+        when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
+
+        // when
+        try {
+            sessionService.deleteSession(12L, "steven");
+            fail("Expect exception to be thrown");
+        } catch(RuntimeException e) {
+            assertEquals("Current user is not the session owner", e.getMessage());
+        }
+
+        // verify
+        verify(sessionRepository, times(1)).findById(eq(12L));
         verify(sessionRepository, times(0)).saveAndFlush(any());
     }
 
@@ -352,7 +375,7 @@ class SessionServiceTest {
         when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(session));
 
         // when
-        sessionService.deleteSession(15L);
+        sessionService.deleteSession(15L, "ed");
 
         // verify
         verify(sessionRepository, times(1)).findById(eq(15L));

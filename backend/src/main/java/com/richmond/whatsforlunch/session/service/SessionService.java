@@ -1,5 +1,6 @@
 package com.richmond.whatsforlunch.session.service;
 
+import com.richmond.whatsforlunch.session.exception.CurrentUserIsNotOwnerException;
 import com.richmond.whatsforlunch.session.exception.UserNotFoundException;
 import com.richmond.whatsforlunch.session.repository.SessionRepository;
 import com.richmond.whatsforlunch.session.repository.entity.ParticipantEntity;
@@ -42,23 +43,17 @@ public class SessionService {
     /**
      * Create new session.
      * @param date for date
-     * @param ownerId by owner
+     * @param ownerUserName by owner username
      * @param participantIds with participants
      * @return newly created session
      */
-    public Session createNewSession(final LocalDate date, final long ownerId, final List<Long> participantIds) {
+    public Session createNewSession(final LocalDate date, final String ownerUserName, final List<Long> participantIds) {
 
-        final List<Long> userIds = new ArrayList<>(participantIds);
-        userIds.add(ownerId);
+        final UserEntity owner = userRepository.findByUserName(ownerUserName)
+                .orElseThrow(() -> new UserNotFoundException(ApplicationMessages.ERROR_OWNER_NOT_FOUND));
 
-        final Map<Long, UserEntity> userMap = userRepository.findAllById(userIds)
+        final Map<Long, UserEntity> userMap = userRepository.findAllById(participantIds)
                 .stream().collect(Collectors.toMap(UserEntity::getId, Function.identity()));
-
-        final UserEntity owner = userMap.get(ownerId);
-        if(owner == null) {
-            // owner ID is not valid
-            throw new UserNotFoundException(ApplicationMessages.ERROR_OWNER_NOT_FOUND);
-        }
 
         // create a new session
         final SessionEntity session = SessionEntity.builder()
@@ -87,28 +82,6 @@ public class SessionService {
         return ServiceBeanMapper.mapToBean(session);
     }
 
-    /**
-     * Get collection of sessions by owner and status
-     * @param ownerId owner ID
-     * @param status array of status
-     * @return collection of session
-     */
-    public List<Session> getSessionsByOwner(final long ownerId, final List<String> status) {
-        return sessionRepository.findByOwnerAndStatus(ownerId, getStatusObject(status))
-                .stream().map(ServiceBeanMapper::mapToBean).toList();
-    }
-
-    /**
-     * Get collection of sessions by participant and status
-     * @param participantId participant ID
-     * @param status array of status
-     * @return collection of session
-     */
-    public List<Session> getSessionsByParticipant(final long participantId, final List<String> status) {
-        return sessionRepository.findByParticipantAndStatus(participantId, getStatusObject(status))
-                .stream().map(ServiceBeanMapper::mapToBean).toList();
-    }
-
     private Set<SessionStatus> getStatusObject(final List<String> status) {
         return status.stream().map(SessionStatus::find).filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
@@ -128,11 +101,16 @@ public class SessionService {
     /**
      * Delete session
      * @param id session ID
+     * @param actionedBy username who actioned
      */
-    public void deleteSession(final long id) {
+    public void deleteSession(final long id, final String actionedBy) {
         // get session
         final SessionEntity session = sessionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_SESSION_ID_INVALID));
+        // check it's the owner
+        if(!session.getOwner().getUserName().equals(actionedBy)) {
+            throw new CurrentUserIsNotOwnerException();
+        }
 
         // flag session
         session.setStatus(SessionStatus.DELETED);
@@ -141,5 +119,12 @@ public class SessionService {
         sessionRepository.saveAndFlush(session);
     }
 
+    public List<Session> getSessionsByUser(final String name, final List<String> status) {
+        // get user
+        final UserEntity user = userRepository.findByUserName(name)
+                .orElseThrow(() -> new IllegalArgumentException(ApplicationMessages.ERROR_USER_ID_NOT_FOUND));
 
+        // get sessions by user id
+        return sessionRepository.findByUserNameAndStatus(user.getId(), getStatusObject(status)).stream().map(ServiceBeanMapper::mapToBean).toList();
+    }
 }

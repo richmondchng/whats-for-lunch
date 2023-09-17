@@ -1,5 +1,6 @@
 package com.richmond.whatsforlunch.session.controller;
 
+import com.richmond.whatsforlunch.common.config.TestSecurityConfig;
 import com.richmond.whatsforlunch.session.repository.entity.SessionStatus;
 import com.richmond.whatsforlunch.session.service.SelectionService;
 import com.richmond.whatsforlunch.session.service.SessionService;
@@ -13,7 +14,9 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -47,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test SessionController
  */
 @WebMvcTest(controllers = { SessionController.class })
+@Import({ TestSecurityConfig.class })
 class SessionControllerTest {
 
     @Autowired
@@ -65,9 +69,10 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenRequestBodyIsValid_whenCreateNewSession_returnNewSession() throws Exception {
 
-        when(sessionService.createNewSession(any(LocalDate.class), anyLong(), anyList())).thenReturn(
+        when(sessionService.createNewSession(any(LocalDate.class), anyString(), anyList())).thenReturn(
           new Session(99L, LocalDate.of(2023, 9, 12),
                   new Owner(2L, "ed", "Edward"),
                   List.of(new Participant(2L, "ed", "Edward", "PENDING"),
@@ -75,7 +80,7 @@ class SessionControllerTest {
                   Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1)
         );
 
-        final String content = "{\"date\":\"2023-09-12\", \"owner\":2, \"participants\": [2, 5]}";
+        final String content = "{\"date\":\"2023-09-12\", \"participants\": [2, 5]}";
         mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
@@ -107,7 +112,7 @@ class SessionControllerTest {
 
         verify(sessionService, times(1)).createNewSession(
                 eq(LocalDate.of(2023, 9, 12)),
-                eq(2L),
+                eq("ed"),
                 participantsCaptor.capture());
         final Set<Long> expectedParticipants = Stream.of(2L, 5L).collect(Collectors.toSet());
         for (long id : participantsCaptor.getValue()) {
@@ -121,9 +126,10 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "john")
     void givenRequestBodyWithoutDate_whenCreateNewSession_returnError() throws Exception {
 
-        final String content = "{\"owner\":2, \"participants\": [2]}";
+        final String content = "{\"participants\": [2]}";
         mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.timestamp", notNullValue()))
@@ -136,47 +142,14 @@ class SessionControllerTest {
     }
 
     /**
-     * Given request body does not contain mandatory owner field, when invoke POST /api/v1/sessions, fail and throw error
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestBodyWithoutOwnerId_whenCreateNewSession_returnError() throws Exception {
-
-        final String content = "{\"date\":\"2023-09-12\", \"participants\": [2, 5, 6, 7]}";
-        mockMvc.perform(post("/api/v1/sessions").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is(400)))
-                .andExpect(jsonPath("$.error", is("Bad Request")))
-                .andExpect(jsonPath("$.message", is("Owner Id is mandatory")))
-                .andExpect(jsonPath("$.path", is("/api/v1/sessions")));
-
-        verifyNoInteractions(sessionService);
-    }
-
-    /**
-     * Given request without owner or participant parameters, when invoke GET /api/v1/sessions, return empty list
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithoutUserIdParam_whenGetSessions_defaultStatus() throws Exception {
-
-        mockMvc.perform(get("/api/v1/sessions"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(0)));
-
-        verifyNoInteractions(sessionService);
-    }
-
-    /**
      * Given request with owner ID parameter, when invoke GET /api/v1/sessions, return collection
      * @throws Exception exception
      */
     @Test
+    @WithMockUser("andy")
     void givenRequestWithOwnerIdParam_whenGetSessions_returnOwnerSessionWithDefaultStatus() throws Exception {
 
-        when(sessionService.getSessionsByOwner(anyLong(), any())).thenReturn(
+        when(sessionService.getSessionsByUser(anyString(), any())).thenReturn(
                 List.of(new Session(99L, LocalDate.of(2023, 9, 12),
                             new Owner(2L, "ed", "Edward"),
                             List.of(new Participant(2L, "ed", "Edward", "PENDING"),
@@ -184,66 +157,15 @@ class SessionControllerTest {
                             Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
         );
 
-        mockMvc.perform(get("/api/v1/sessions?owner=2"))
+        mockMvc.perform(get("/api/v1/sessions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].id", is(99)))
                 .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
 
-        verify(sessionService, times(1)).getSessionsByOwner(2L, List.of("ACTIVE","CLOSED"));
+        verify(sessionService, times(1)).getSessionsByUser("andy", List.of("ACTIVE","CLOSED"));
     }
-
-    /**
-     * Given request with participant ID parameter, when invoke GET /api/v1/sessions, return collection
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithParticipantIdParam_whenGetSessions_returnParticipantSessionWithDefaultStatus() throws Exception {
-
-        when(sessionService.getSessionsByParticipant(anyLong(), any())).thenReturn(
-                List.of(new Session(99L, LocalDate.of(2023, 9, 12),
-                        new Owner(2L, "ed", "Edward"),
-                        List.of(new Participant(2L, "ed", "Edward", "PENDING"),
-                                new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
-        );
-
-        mockMvc.perform(get("/api/v1/sessions?participant=5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].id", is(99)))
-                .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
-
-        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("ACTIVE","CLOSED"));
-    }
-
-    /**
-     * Given request with status parameter, when invoke GET /api/v1/sessions, return collection
-     * @throws Exception exception
-     */
-    @Test
-    void givenRequestWithStatusParam_whenGetSessions_returnOwnerSessionWithSelectedStatus() throws Exception {
-
-        when(sessionService.getSessionsByParticipant(anyLong(), any())).thenReturn(
-                List.of(new Session(99L, LocalDate.of(2023, 9, 12),
-                        new Owner(2L, "ed", "Edward"),
-                        List.of(new Participant(2L, "ed", "Edward", "PENDING"),
-                                new Participant(5L, "peggy", "Peggy", "PENDING")),
-                                Collections.emptyList(), 0L, SessionStatus.ACTIVE.getName(), 1))
-        );
-
-        mockMvc.perform(get("/api/v1/sessions?participant=5&status=CLOSED,DELETED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].id", is(99)))
-                .andExpect(jsonPath("$.data[0].date", is("2023-09-12")));
-
-        verify(sessionService, times(1)).getSessionsByParticipant(5L, List.of("CLOSED", "DELETED"));
-    }
-
 
     /**
      * Given path variable session ID is 0, when invoke GET /api/v1/sessions/{id}, throw error
@@ -317,6 +239,7 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenRequestIsValid_whenDeleteSession_returnSuccessStatus() throws Exception {
 
         mockMvc.perform(delete("/api/v1/sessions/2"))
@@ -325,7 +248,7 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].status", is("Success")));
 
-        verify(sessionService, times(1)).deleteSession(2L);
+        verify(sessionService, times(1)).deleteSession(2L, "ed");
     }
 
     /**
@@ -333,6 +256,7 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenSessionIdIsZero_whenDeleteSession_returnError() throws Exception {
 
         mockMvc.perform(delete("/api/v1/sessions/0"))
@@ -351,10 +275,11 @@ class SessionControllerTest {
      * @throws Exception exception
      */
     @Test
+    @WithMockUser(username = "ed")
     void givenValidRequest_whenPatchSession_returnSessionDetails() throws Exception {
 
         final Restaurant restaurant1 = new Restaurant(5L, 2L, "Brian's Eatery", "Fusion food", "ACTIVE");
-        when(selectionService.selectRestaurant(anyLong(), anyString())).thenReturn(restaurant1);
+        when(selectionService.selectRestaurant(anyLong(), anyString(), anyString())).thenReturn(restaurant1);
 
         final String content = "{\"strategy\":\"RANDOM\"}";
         mockMvc.perform(patch("/api/v1/sessions/99").contentType(MediaType.APPLICATION_JSON_VALUE).content(content))
@@ -365,6 +290,6 @@ class SessionControllerTest {
                 .andExpect(jsonPath("$.data[0].restaurantId", is(5)))
                 .andExpect(jsonPath("$.data[0].restaurantName", is("Brian's Eatery")));
 
-        verify(selectionService, times(1)).selectRestaurant(eq(99L), eq("RANDOM"));
+        verify(selectionService, times(1)).selectRestaurant(eq(99L), eq("ed"), eq("RANDOM"));
     }
 }

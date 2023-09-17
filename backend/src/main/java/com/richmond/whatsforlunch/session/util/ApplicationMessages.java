@@ -12,7 +12,7 @@ public final class ApplicationMessages {
     public static final String ERROR_RESTAURANT_MANDATORY = "Restaurant is mandatory";
     public static final String ERROR_RESTAURANT_ID_MANDATORY = "Restaurant ID is mandatory";
     public static final String ERROR_PARTICIPANT_ID_MANDATORY = "Participant ID is mandatory";
-    public static final String ERROR_PATCH_SESSION_STATUS_MANDATORY = "Patch session status is mandatory";
+    public static final String ERROR_SESSION_OWNER_IS_NOT_CURRENT_USER = "Current user is not the session owner";
     public static final String SUCCESS_MESSAGE = "Success";
 
     public static final String ERROR_OWNER_NOT_FOUND = "Owner is not found";
@@ -22,9 +22,9 @@ public final class ApplicationMessages {
     public static final String ERROR_USER_NOT_PARTICIPANT = "User is not a participant";
     public static final String ERROR_RESTAURANT_NAME_OVER_MAX = "Restaurant name is too long (max 255 character)";
     public static final String ERROR_DESCRIPTION_OVER_MAX = "Description is too long (max 255 character)";
-
     public static final String ERROR_RESTAURANT_NOT_IN_SESSION = "Restaurant is not session";
     public static final String ERROR_PARTICIPANT_NOT_IN_SESSION = "Participant is not session";
+    public static final String ERROR_USER_ID_NOT_FOUND = "User is not valid";
 
     public static final String ERROR_STRATEGY_NOT_FOUND = "Strategy is not found";
 

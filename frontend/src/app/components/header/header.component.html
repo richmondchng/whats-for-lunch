@@ -5,6 +5,7 @@
       ></fa-icon>
       {{ title }}
     </h1>
+    <div *ngIf="me">Hello {{ me.displayName }} <button class="btn" (click)="onLogout()">Logout</button></div>
 </header>
 <div class="message-box"
   *ngIf="showMessage" 

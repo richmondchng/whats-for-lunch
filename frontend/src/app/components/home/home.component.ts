@@ -6,6 +6,7 @@ import { SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
 import { MessageService } from 'src/app/services/message.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,7 @@ export class HomeComponent implements OnInit {
   faTimes = faTimes;
   sessions: SessionBody[] = [];
 
-  constructor(private sessionsService: SessionsService, private messageService: MessageService) {}
+  constructor(private sessionsService: SessionsService, private messageService: MessageService, private authenticationService: AuthenticationService, private router: Router) {}
 
   ngOnInit(): void {
     this.sessionsService.getSessionForUser().subscribe({
@@ -25,6 +26,9 @@ export class HomeComponent implements OnInit {
       next: (sessions) => (this.sessions = sessions.sort((a, b) => a.date >= b.date ? -1 : 1)),
       error: (err) => this.publishError(err)
     });
+    if(!this.authenticationService.amILoggedIn()) {
+      this.router.navigateByUrl('/');
+    }
   }
 
   findActiveSessions(data: SessionBody[]) : SessionBody[] {

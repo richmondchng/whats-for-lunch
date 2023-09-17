@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SessionsService } from 'src/app/services/sessions.service';
 import { SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { Restaruant } from 'src/app/interfaces/Restaurant';
@@ -9,6 +9,7 @@ import { ResponseSelectRestaurant } from 'src/app/interfaces/ResponseDetails';
 import { faCalendarDay, faUtensils, faUserGroup, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
 import { MessageService } from 'src/app/services/message.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-session-details',
@@ -34,7 +35,7 @@ export class SessionDetailsComponent implements OnInit {
   faUtensils = faUtensils;
   faUserGroup = faUserGroup;
 
-  constructor(private route: ActivatedRoute, private sessionService: SessionsService, private messageService: MessageService) {}
+  constructor(private route: ActivatedRoute, private router: Router, private sessionService: SessionsService, private messageService: MessageService, private authenticationService: AuthenticationService) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe({
@@ -59,7 +60,9 @@ export class SessionDetailsComponent implements OnInit {
       },
       error: (err) => this.publishError(err)
     });
-    
+    if(!this.authenticationService.amILoggedIn()) {
+      this.router.navigateByUrl('/');
+    }
   }
 
   loadSessionDetails(sessionId:number) {

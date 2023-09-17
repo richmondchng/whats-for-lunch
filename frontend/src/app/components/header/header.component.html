@@ -6,7 +6,7 @@
       {{ title }}
     </h1>
 </header>
-<div class="message-box" 
+<div class="message-box"
   *ngIf="showMessage" 
   [ngClass]="{ 'message-box-error' : (message.category === 'ERROR') }">
   <h3>{{ message.category === 'ERROR' ? 'Attention' : 'Information' }}<fa-icon [icon]="faTimes" (click)="onCloseMessage()"></fa-icon></h3>

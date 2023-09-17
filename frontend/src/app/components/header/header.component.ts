@@ -24,6 +24,9 @@ export class HeaderComponent {
       .subscribe((value: DisplayMessage) => {
         this.showMessage = true;
         this.message = value;
+        setTimeout(() => {
+          this.showMessage = false;
+        }, 5000);
       });
   }
 

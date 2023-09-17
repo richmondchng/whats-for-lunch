@@ -1,9 +1,10 @@
 <div class="session-dashboard">
     <p><a [routerLink]="['/home']">< Back</a></p>
-    <h2><fa-icon [icon]="faCalendarDay"></fa-icon> {{ session.date }}
-        <form (submit)="selectRestaurant()" *ngIf="showSelectRestaurantButton">
-            <input type="submit" class="btn form-control-btn" value="Select a Restaurant" />
-        </form>
+    <h2><fa-icon [icon]="faCalendarDay"></fa-icon> {{ session.date }} 
+        <!-- <form (submit)="selectRestaurant()" *ngIf="showSelectRestaurantButton"> -->
+            <button class="btn form-control-btn"
+            (click)="selectRestaurant()" *ngIf="showSelectRestaurantButton">Select a Restaurant</button>
+        <!-- </form> -->
     </h2>
     <div class="session-group">
         <div class="session-group-item">

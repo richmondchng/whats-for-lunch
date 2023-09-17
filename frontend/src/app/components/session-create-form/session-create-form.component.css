@@ -1,5 +1,33 @@
 .session-create-container {
     padding-bottom: 1em;
     padding-right: 1em;
+    margin-bottom: 3em;
+}
+
+.session-create-container h2{    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.create-form-control {
+    margin: 10px;
+}
+
+.create-form-control-label {
+    font-weight: bold;
+    margin-top: 0.5em;
     display: block;
+}
+
+.create-form-control-input {
+    width: 98%;
+    border-width: 1px 1px 1px 1px;
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
 }

@@ -20,11 +20,13 @@ public class UserService {
 
     /**
      * Get all users.
+     * @param includeAdmin true to include admin user
      * @return collection of users, or empty collection
      */
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(final boolean includeAdmin) {
         return userRepository.findAll()
-                .stream().map(this::mapToBean)
+                .stream().filter(u -> includeAdmin || (!"admin".equalsIgnoreCase(u.getUserName())))
+                .map(this::mapToBean)
                 .collect(Collectors.toUnmodifiableList());
 
     }

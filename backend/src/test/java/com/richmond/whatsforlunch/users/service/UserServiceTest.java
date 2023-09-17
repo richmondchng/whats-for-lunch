@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,7 +47,7 @@ class UserServiceTest {
     @Test
     void givenNoUsers_whenGetAllUsers_returnEmpty() {
         // when
-        final Collection<User> results = userService.getAllUsers();
+        final Collection<User> results = userService.getAllUsers(true);
 
         // then
         assertNotNull(results);
@@ -54,27 +55,68 @@ class UserServiceTest {
     }
 
     /**
-     * Given existing users, when getAllUsers, return collection of users.
+     * Given existing users excluding admin, when getAllUsers, return collection of users.
      */
     @Test
-    void givenUsers_whenGetAllUsers_returnMappedUserBeans() {
+    void givenUsersExcludeAdmin_whenGetAllUsers_returnMappedUserBeansExceptAdmin() {
         // given
         when(userRepository.findAll()).thenReturn(List.of(
-                UserEntity.builder().id(100L).userName("jw").firstName("John").lastName("Wong").build()));
+                UserEntity.builder().id(100L).userName("jw").firstName("John").lastName("Wong").build(),
+                UserEntity.builder().id(101L).userName("admin").firstName("Admin").lastName("Admin").build(),
+                UserEntity.builder().id(102L).userName("ron").firstName("Ronald").lastName("Lau").build()
+        ));
 
         // when
-        final Collection<User> results = userService.getAllUsers();
+        final Collection<User> results = userService.getAllUsers(false);
 
         // then
         assertNotNull(results);
-        assertEquals(1, results.size());
+        assertEquals(2, results.size());
 
-        final Iterator<User> itr = results.iterator();
-        final User result = itr.next();
-        assertEquals(100L, result.id());
-        assertEquals("jw", result.userName());
-        assertEquals("John", result.firstName());
-        assertEquals("Wong", result.lastName());
+        final Iterator<User> itr = results.stream().sorted(Comparator.comparing(User::id)).iterator();
+        final User result1 = itr.next();
+        assertEquals(100L, result1.id());
+        assertEquals("jw", result1.userName());
+
+        final User result2 = itr.next();
+        assertEquals(102L, result2.id());
+        assertEquals("ron", result2.userName());
+
+        assertFalse(itr.hasNext());
+    }
+
+    /**
+     * Given existing users including admin, when getAllUsers, return collection of users.
+     */
+    @Test
+    void givenUsersIncludeAdmin_whenGetAllUsers_returnMappedUserBeansExceptAdmin() {
+        // given
+        when(userRepository.findAll()).thenReturn(List.of(
+                UserEntity.builder().id(100L).userName("jw").firstName("John").lastName("Wong").build(),
+                UserEntity.builder().id(101L).userName("admin").firstName("Admin").lastName("Admin").build(),
+                UserEntity.builder().id(102L).userName("ron").firstName("Ronald").lastName("Lau").build()
+        ));
+
+        // when
+        final Collection<User> results = userService.getAllUsers(true);
+
+        // then
+        assertNotNull(results);
+        assertEquals(3, results.size());
+
+        final Iterator<User> itr = results.stream().sorted(Comparator.comparing(User::id)).iterator();
+        final User result1 = itr.next();
+        assertEquals(100L, result1.id());
+        assertEquals("jw", result1.userName());
+
+        final User result2 = itr.next();
+        assertEquals(101L, result2.id());
+        assertEquals("admin", result2.userName());
+
+        final User result3 = itr.next();
+        assertEquals(102L, result3.id());
+        assertEquals("ron", result3.userName());
+
         assertFalse(itr.hasNext());
     }
 }

@@ -45,7 +45,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data", hasSize(0)));
 
-        verify(userService, times(1)).getAllUsers();
+        verify(userService, times(1)).getAllUsers(false);
     }
 
     /**
@@ -54,7 +54,7 @@ class UserControllerTest {
      */
     @Test
     void givenUsers_whenGetUsers_returnArrayWithUsers() throws Exception {
-        when(userService.getAllUsers()).thenReturn(List.of(
+        when(userService.getAllUsers(false)).thenReturn(List.of(
                 new User(1, "adamt", null, null, "adam", "tan"),
                 new User(2, "johno", null, null, "john", "ong")));
 
@@ -71,6 +71,27 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data[1].firstName", is("john")))
                 .andExpect(jsonPath("$.data[1].lastName", is("ong")));
 
-        verify(userService, times(1)).getAllUsers();
+        verify(userService, times(1)).getAllUsers(false);
+    }
+
+    /**
+     * Given users exists, when invoke GET /api/v1/users, return array of users
+     * @throws Exception exception
+     */
+    @Test
+    void givenUsersIncludeAdmin_whenGetUsers_returnArrayWithUsers() throws Exception {
+        when(userService.getAllUsers(true)).thenReturn(List.of(
+                new User(1, "admin", null, null, "admin", "admin")));
+
+        mockMvc.perform(get("/api/v1/users?includeAdmin=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].userName", is("admin")))
+                .andExpect(jsonPath("$.data[0].firstName", is("admin")))
+                .andExpect(jsonPath("$.data[0].lastName", is("admin")));
+
+        verify(userService, times(1)).getAllUsers(true);
     }
 }

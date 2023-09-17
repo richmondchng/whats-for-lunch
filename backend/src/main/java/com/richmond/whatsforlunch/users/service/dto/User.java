@@ -1,4 +1,6 @@
 package com.richmond.whatsforlunch.users.service.dto;
 
-public record User(long id, String userName, String firstName, String lastName) {
+import java.util.List;
+
+public record User(long id, String userName, String password, List<String> roles, String firstName, String lastName) {
 }

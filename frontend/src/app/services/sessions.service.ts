@@ -108,8 +108,8 @@ export class SessionsService {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong.
       console.error(`Backend returned code ${error.status}, body was: `, error.error);
-      if(error.status === 401) {
-        msg = 'Token has expired, please log in again';
+      if(error.error && error.error.message) {
+        msg = "Error: " + error.error.message;
       }
     }
     // Return an observable with a user-facing error message.

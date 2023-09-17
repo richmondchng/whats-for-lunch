@@ -6,6 +6,7 @@ import { MessageService } from 'src/app/services/message.service';
 import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
 import { Session } from 'src/app/interfaces/Session';
 import { UserService } from 'src/app/services/user.service';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-session-create-form',
@@ -14,11 +15,12 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class SessionCreateFormComponent implements OnInit {
   startDate = new Date();
-  showForm: boolean = true;
+  showForm: boolean = false;
   sessionDate = new FormControl<Date>(new Date());
   sessionParticipants = new FormControl<number[]>([]);
   @Output() onCreateSession: EventEmitter<Session> = new EventEmitter();
-  participantList: UserBody[] = []
+  participantList: UserBody[] = [];
+  faTimes = faTimes;
 
   constructor(private sessionService: SessionsService, private userService: UserService, private messageService: MessageService) {}
 

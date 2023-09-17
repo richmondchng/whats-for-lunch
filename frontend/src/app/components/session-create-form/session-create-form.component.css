@@ -1,14 +1,14 @@
 .session-create-container {
     padding-bottom: 1em;
     padding-right: 1em;
-    /* display: flex; */
     margin-bottom: 3em;
-    /* align-items: right; */
 }
-/* 
-.create-form {
-    display: inline-block;
-} */
+
+.session-create-container h2{    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
 .create-form-control {
     margin: 10px;
@@ -22,13 +22,6 @@
 
 .create-form-control-input {
     width: 98%;
-    /* height: 40px;
-    margin: 5px;
-    padding: 3px 7px; */
-/* 
-    padding: 0.5em; 
-    height: 2em; */
-    /* margin-right: 0.5em; */
     border-width: 1px 1px 1px 1px;
     border-color: rgba(0,0,0,0.2);
     border-radius: 5px;

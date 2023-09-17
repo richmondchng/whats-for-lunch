@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ResponseSessions, SessionBody, ResponseDeleteSession, ResponseAddRestaurant } from '../interfaces/ResponseDetails';
+import { ResponseSessions, SessionBody, ResponseDeleteSession, ResponseAddRestaurant, ResponseSelectRestaurant } from '../interfaces/ResponseDetails';
 import { Restaruant } from '../interfaces/Restaurant';
 import { environment } from 'src/environments/environment';
 
@@ -61,5 +61,15 @@ export class SessionsService {
     return this.http.post<ResponseAddRestaurant>(url, 
       { restaurant: restaurant.name, description: restaurant.description},
       { headers: headers });
+  }
+
+  selectRestaurantForSession(sessionId: number) {
+    const headers = new HttpHeaders({
+      'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+      'Content-Type' : 'application/json'
+    });
+    const url = `${environment.apiUrl}/sessions/${sessionId}`;
+    return this.http.patch<ResponseSelectRestaurant>(url, 
+      { strategy: "RANDOM" }, { headers: headers });
   }
 }

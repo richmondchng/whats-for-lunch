@@ -65,8 +65,16 @@ interface ResponseAddRestaurant {
     }]
 }
 
+interface ResponseSelectRestaurant {
+    data: [{
+        sessionId: number;
+        restaurantId: number;
+        restaurantName: string;
+    }]
+}
+
 export {
     ResponseSessions, SessionBody, OwnerBody, ParticipantBody, RestaurantBody,
     ResponseTokens, TokenBody, ResponseUsers, UserBody,
-    ResponseDeleteSession, ResponseAddRestaurant
+    ResponseDeleteSession, ResponseAddRestaurant, ResponseSelectRestaurant
 }

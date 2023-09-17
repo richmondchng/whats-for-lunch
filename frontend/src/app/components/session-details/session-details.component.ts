@@ -5,6 +5,8 @@ import { SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { Restaruant } from 'src/app/interfaces/Restaurant';
 import { concatMap} from 'rxjs/operators';
 import { Me } from 'src/app/interfaces/Me';
+import { ResponseSelectRestaurant } from 'src/app/interfaces/ResponseDetails';
+import { faCalendarDay, faUtensils, faUserGroup, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-session-details',
@@ -25,6 +27,10 @@ export class SessionDetailsComponent implements OnInit {
   restaurant: Restaruant = {name: "", description: ""};
   showSelectRestaurantButton: boolean = false;
   showAddRestaurantForm: boolean = false;
+  faCalendarDay = faCalendarDay;
+  faCheck = faCheck;
+  faUtensils = faUtensils;
+  faUserGroup = faUserGroup;
 
   constructor(private route: ActivatedRoute, private sessionService: SessionsService) {}
 
@@ -52,6 +58,10 @@ export class SessionDetailsComponent implements OnInit {
   }
 
   addRestaurant() {
+    if (!this.restaurant.name) {
+      alert('Please add a restaurant');
+      return;
+    }
     this.sessionService.addRestaurantToSession(this.session.id, this.restaurant)
     .subscribe(() => {
       this.loadSessionDetails(this.session.id);
@@ -60,4 +70,12 @@ export class SessionDetailsComponent implements OnInit {
     });
   }
 
+  selectRestaurant() {
+    this.sessionService.selectRestaurantForSession(this.session.id).subscribe(
+      (response: ResponseSelectRestaurant)=>{
+        this.showSelectRestaurantButton = false;
+        this.showAddRestaurantForm = false;
+        console.log("Selected " + response.data[0].restaurantName);
+    });
+  }
 }

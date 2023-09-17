@@ -1,21 +1,25 @@
 <div class="session-dashboard">
-    <a [routerLink]="['/home']">< Back</a>
-    <h2>{{ session.date }}
-        <form (submit)="addRestaurant()" *ngIf="showSelectRestaurantButton">
+    <p><a [routerLink]="['/home']">< Back</a></p>
+    <h2><fa-icon [icon]="faCalendarDay"></fa-icon> {{ session.date }}
+        <form (submit)="selectRestaurant()" *ngIf="showSelectRestaurantButton">
             <input type="submit" class="btn form-control-btn" value="Select a Restaurant" />
         </form>
     </h2>
     <div class="session-group">
         <div class="session-group-item">
-            <h2>Participants</h2>
+            <h2><fa-icon [icon]="faUserGroup"></fa-icon> Participants</h2>
             <div class="session-list">
-                <div class="session-list-item" *ngFor="let participant of session.participants">{{participant.userName}}</div>
+                <div class="session-list-item" *ngFor="let participant of session.participants">{{participant.displayName}}</div>
             </div>
         </div>
         <div class="session-group-item">
-            <h2>Restaurants</h2>
+            <h2><fa-icon [icon]="faUtensils"></fa-icon> Restaurants</h2>
             <div class="session-list">
-                <div class="session-list-item" *ngFor="let restaurant of session.restaurants">{{restaurant.restaurantName}}</div>
+                <div class="session-list-item" 
+                    *ngFor="let restaurant of session.restaurants"
+                    [ngClass]="{ 'session-list-item-owner' : session.selectedRestaurant === restaurant.id}"
+                    ><fa-icon [icon]="faCheck" *ngIf="session.selectedRestaurant === restaurant.id"></fa-icon> {{restaurant.restaurantName}}
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,25 @@
+<!-- <app-session-create-form></app-session-create-form> -->
+<div class="session-dashboard">
+    <div class="session-group">
+        <div class="session-group-item">
+            <h2>Active</h2>
+            <div class="session-list">
+                <app-session-overview-card
+                    *ngFor="let session of findActiveSessions(sessions).slice(0, 10)"
+                    [session]="session"
+                    (onDeleteSession)="deleteSession(session)"
+                ></app-session-overview-card>
+            </div>
+        </div>
+        <div class="session-group-item">
+            <h2>Closed</h2>
+            <div class="session-list">
+                <app-session-overview-card
+                    *ngFor="let session of findClosedSessions(sessions).slice(0, 10)"
+                    [session]="session"
+                    (onDeleteSession)="deleteSession(session)"
+                ></app-session-overview-card>
+            </div>
+        </div>
+    </div>
+</div>

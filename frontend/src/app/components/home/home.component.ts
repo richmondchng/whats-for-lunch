@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { SessionsService } from 'src/app/services/sessions.service';
 import { Router } from '@angular/router';
 import { Me } from 'src/app/interfaces/Me';
-import { SessionBody } from 'src/app/interfaces/ResponseDetails';
+import { ResponseSessions, SessionBody } from 'src/app/interfaces/ResponseDetails';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { DisplayMessage } from 'src/app/interfaces/DisplayMessage';
 import { MessageService } from 'src/app/services/message.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Session } from 'src/app/interfaces/Session';
 
 @Component({
   selector: 'app-home',
@@ -46,6 +47,16 @@ export class HomeComponent implements OnInit {
         next: () => (this.sessions = this.sessions.filter((s) => s.id !== session.id)),
         error: (err) => this.publishError(err)
       });
+  }
+
+  createSession(session: Session) {
+    this.sessionsService.createSession(session).subscribe({
+      next: (response: ResponseSessions) => {
+        this.sessions.push(response.data[0]);
+        this.sessions = this.sessions.sort((a, b) => a.date >= b.date ? -1 : 1)
+      },
+      error: (err) => this.publishError(err)
+    });
   }
 
   publishError(err: Error) {

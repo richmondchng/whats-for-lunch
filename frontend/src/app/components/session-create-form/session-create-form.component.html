@@ -1,18 +1,27 @@
 <div class="session-create-container">
-    <button class="btn">Create Session</button>
-    <div class="form-control">
-        <label for="sessionDate">Date</label>
-        <!-- <mat-form-field>
-            <input matInput [matDatepicker]="picker">
-            <mat-hint>DD/MM/YYYY</mat-hint>
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <input type="button" class="btn" (click)="toggleForm()" *ngIf="!showForm" value="Create Session" />
+
+    <form *ngIf="showForm" (submit)="createSession()" class="create-form">
+      <h2>Create a new Session</h2>
+      <div class="create-form-control">
+        <label class="create-form-control-label">Date</label>
+        <mat-form-field appearance="outline" class="create-form-control-input">
+            <input matInput [matDatepicker]="picker" [formControl]="sessionDate">
             <mat-datepicker #picker [startAt]="startDate"></mat-datepicker>
-        </mat-form-field> -->
-        <!-- <mat-form-field>
-            <mat-label>Toppings</mat-label>
-            <mat-select [formControl]="toppings" multiple>
-              <mat-option *ngFor="let topping of toppingList" [value]="topping">{{topping}}</mat-option>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        </mat-form-field>
+      </div>
+      <div class="create-form-control">
+        <label class="create-form-control-label">Participants</label>
+        <mat-form-field appearance="outline" class="create-form-control-input">
+            <mat-label>Select participants</mat-label>
+            <mat-select [formControl]="sessionParticipants" multiple>
+              <mat-option *ngFor="let participant of participantList" [value]="participant.id"
+              >{{participant.firstName}} {{participant.lastName}}</mat-option>
             </mat-select>
-          </mat-form-field> -->
-    </div>
+          </mat-form-field>
+      </div>
+      <input type="submit" class="btn form-control-btn" value="Create" /> 
+      <!-- <input type="button" class="btn" (click)="toggleForm()" value="Cancel" /> -->
+    </form>
 </div>

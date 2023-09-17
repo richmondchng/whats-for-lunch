@@ -1,0 +1,14 @@
+<h2>{{ title }}</h2>
+<form class="login-form" (submit)="login()">
+    <div class="form-control">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="User name"
+            [(ngModel)]="credentials.username" />
+    </div>
+    <div class="form-control">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Password"
+            [(ngModel)]="credentials.password" />
+    </div>
+    <input type="submit" class="btn form-control-btn" value="Login" />
+</form>

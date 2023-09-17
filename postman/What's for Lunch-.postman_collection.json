@@ -29,7 +29,7 @@
 							"basic": [
 								{
 									"key": "username",
-									"value": "natasha",
+									"value": "john",
 									"type": "string"
 								},
 								{
@@ -73,7 +73,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{servername}}/api/v1/users",
+							"raw": "http://{{servername}}/api/v1/users?includeAdmin=true",
 							"protocol": "http",
 							"host": [
 								"{{servername}}"
@@ -82,6 +82,12 @@
 								"api",
 								"v1",
 								"users"
+							],
+							"query": [
+								{
+									"key": "includeAdmin",
+									"value": "true"
+								}
 							]
 						}
 					},

@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,11 +44,12 @@ public class SessionController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> createNewSession(
-            @RequestBody final RequestCreateNewSession request) {
-        Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
-        Assert.isTrue(request.owner() > 0, ApplicationMessages.ERROR_SESSION_OWNER_ID_MANDATORY);
+            @RequestBody final RequestCreateNewSession request, final Principal principal) {
 
-        final Session session = sessionService.createNewSession(request.date(), request.owner(), request.participants());
+        Assert.notNull(request.date(), ApplicationMessages.ERROR_SESSION_DATE_MANDATORY);
+
+        final Session session = sessionService.createNewSession(request.date(), principal.getName(),
+                request.participants());
         // return created session
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBean(session)));
     }
@@ -57,24 +58,15 @@ public class SessionController {
     /**
      * Get sessions.
      * @param status list of status to returned
-     * @param owner filtered by owner ID
-     * @param participant filtered by participant ID
+     * @param principal user
      * @return list of sessions
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseSession>> getSessions(
             @RequestParam(defaultValue = "ACTIVE,CLOSED") final List<String> status,
-            @RequestParam(required = false) final Long owner,
-            @RequestParam(required = false) final Long participant) {
+            final Principal principal) {
 
-        final List<Session> results;
-        if(owner != null) {
-            results = sessionService.getSessionsByOwner(owner, status);
-        } else if(participant != null) {
-            results = sessionService.getSessionsByParticipant(participant, status);
-        } else {
-            results = new ArrayList<>(0);
-        }
+        final List<Session> results = sessionService.getSessionsByUser(principal.getName(), status);
         return ResponseEntity.ok(new StandardResponse<>(ResponseSessionUtil.mapToBeans(results)));
     }
 
@@ -96,10 +88,11 @@ public class SessionController {
      * @return action status
      */
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id) {
+    public ResponseEntity<StandardResponse<ResponseDeleteSession>> deleteSession(@PathVariable final long id, final Principal principal) {
         Assert.isTrue(id > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
-        sessionService.deleteSession(id);
-        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(id, "DELETE", ApplicationMessages.SUCCESS_MESSAGE)));
+        sessionService.deleteSession(id, principal.getName());
+        return ResponseEntity.ok(new StandardResponse<>(new ResponseDeleteSession(id, "DELETE",
+                ApplicationMessages.SUCCESS_MESSAGE)));
     }
 
     /**
@@ -109,23 +102,23 @@ public class SessionController {
      * @return ResponseSession
      */
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StandardResponse<ResponsePatchSession>> patchSession(@PathVariable final long id,
-                                                                          @RequestBody final RequestPatchSession body) {
-        final Restaurant restaurant = selectionService.selectRestaurant(id,
+    public ResponseEntity<StandardResponse<ResponsePatchSession>> patchSession(
+            @PathVariable final long id, @RequestBody final RequestPatchSession body, final Principal principal) {
+        final Restaurant restaurant = selectionService.selectRestaurant(id, principal.getName(),
                 // default to random
                 StringUtils.isBlank(body.strategy()) ? "RANDOM" : body.strategy());
 
-        return ResponseEntity.ok(new StandardResponse<>(new ResponsePatchSession(id, restaurant.id(), restaurant.restaurant())));
+        return ResponseEntity.ok(new StandardResponse<>(new ResponsePatchSession(id, restaurant.id(),
+                restaurant.restaurant())));
     }
 }
 
 /**
  * Request body for creating new session
  * @param date session date
- * @param owner session owner id
  * @param participants collection of participants' Ids
  */
-record RequestCreateNewSession(LocalDate date, long owner, List<Long> participants) {}
+record RequestCreateNewSession(LocalDate date, List<Long> participants) {}
 
 /**
  * Request to patch (i.e., to select a restaurant)

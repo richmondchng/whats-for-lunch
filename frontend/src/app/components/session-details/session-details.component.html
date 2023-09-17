@@ -1,0 +1,40 @@
+<div class="session-dashboard">
+    <p><a [routerLink]="['/home']">< Back</a></p>
+    <h2><fa-icon [icon]="faCalendarDay"></fa-icon> {{ session.date }} 
+        <!-- <form (submit)="selectRestaurant()" *ngIf="showSelectRestaurantButton"> -->
+            <button class="btn form-control-btn"
+            (click)="selectRestaurant()" *ngIf="showSelectRestaurantButton">Select a Restaurant</button>
+        <!-- </form> -->
+    </h2>
+    <div class="session-group">
+        <div class="session-group-item">
+            <h2><fa-icon [icon]="faUserGroup"></fa-icon> Participants</h2>
+            <div class="session-list">
+                <div class="session-list-item" *ngFor="let participant of session.participants">{{participant.displayName}}</div>
+            </div>
+        </div>
+        <div class="session-group-item">
+            <h2><fa-icon [icon]="faUtensils"></fa-icon> Restaurants</h2>
+            <div class="session-list">
+                <div class="session-list-item" 
+                    *ngFor="let restaurant of session.restaurants"
+                    [ngClass]="{ 'session-list-item-owner' : session.selectedRestaurant === restaurant.id}"
+                    ><fa-icon [icon]="faCheck" *ngIf="session.selectedRestaurant === restaurant.id"></fa-icon> {{restaurant.restaurantName}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <form (submit)="addRestaurant()" *ngIf="showAddRestaurantForm">
+        <div class="form-control">
+            <label for="restaurant">Restaurant</label>
+            <input type="text" name="restaurant" id="restaurant" placeholder="Restaurant name" 
+                [(ngModel)]="restaurant.name" />
+        </div>
+        <div class="form-control">
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description" placeholder="Optional description..." 
+                [(ngModel)]="restaurant.description" />
+        </div>
+        <input type="submit" class="btn form-control-btn" value="Add" />
+    </form>
+</div>

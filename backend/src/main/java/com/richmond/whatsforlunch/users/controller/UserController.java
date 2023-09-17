@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,9 +28,15 @@ public class UserController {
         return ResponseEntity.ok(new StandardResponse<>(mapToBeans(userService.getAllUsers())));
     }
 
+    @GetMapping(value = "/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StandardResponse<ResponseUser>> getUserByUserName(@PathVariable final String userName) {
+        return ResponseEntity.ok(new StandardResponse<>(mapToBean(userService.getUserByUserName(userName))));
+    }
+
     private List<ResponseUser> mapToBeans(final List<User> beans) {
         return beans.stream().map(this::mapToBean).toList();
     }
+
     private ResponseUser mapToBean(final User bean) {
         return new ResponseUser(bean.id(), bean.userName(), bean.firstName(), bean.lastName());
     }

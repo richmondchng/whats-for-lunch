@@ -1,11 +1,13 @@
 package com.richmond.whatsforlunch.users.controller;
 
+import com.richmond.whatsforlunch.common.config.TestSecurityConfig;
 import com.richmond.whatsforlunch.users.service.UserService;
 import com.richmond.whatsforlunch.users.service.dto.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test UserController
  */
 @WebMvcTest(controllers = { UserController.class })
+@Import({ TestSecurityConfig.class })
 class UserControllerTest {
 
     @Autowired
@@ -52,8 +55,8 @@ class UserControllerTest {
     @Test
     void givenUsers_whenGetUsers_returnArrayWithUsers() throws Exception {
         when(userService.getAllUsers()).thenReturn(List.of(
-                new User(1, "adamt", "adam", "tan"),
-                new User(2, "johno", "john", "ong")));
+                new User(1, "adamt", null, null, "adam", "tan"),
+                new User(2, "johno", null, null, "john", "ong")));
 
         mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())

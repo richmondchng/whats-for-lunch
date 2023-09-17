@@ -1,0 +1,23 @@
+.session-list-item {
+    /* border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 5px; */
+    background-color: #f4f4f4;
+    transition: 0.3s;
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+}
+
+.session-list-item-owner {
+    border-left: 5px solid darkseagreen;
+}
+  
+.session-list-item h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    margin-top: 0;
+}

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 /**
  * Controller to manage restaurant.
  */
@@ -32,12 +34,12 @@ public class RestaurantController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StandardResponse<ResponseAddRestaurant>> addRestaurant(@PathVariable final long sessionId,
-                                                                                 @RequestBody RequestAddRestaurant body) {
+                                                                                 @RequestBody RequestAddRestaurant body,
+                                                                                 final Principal principal) {
         Assert.isTrue(sessionId > 0, ApplicationMessages.ERROR_SESSION_ID_MANDATORY);
-        Assert.isTrue(body.userId() > 0, ApplicationMessages.ERROR_USER_ID_MANDATORY);
         Assert.isTrue(StringUtils.isNotBlank(body.restaurant()), ApplicationMessages.ERROR_RESTAURANT_MANDATORY);
 
-        restaurantService.addRestaurantToSession(sessionId, body.userId(), body.restaurant(), body.description());
+        restaurantService.addRestaurantToSession(sessionId, principal.getName(), body.restaurant(), body.description());
 
         return ResponseEntity.ok(new StandardResponse<>(new ResponseAddRestaurant(ApplicationMessages.SUCCESS_MESSAGE)));
     }
@@ -59,7 +61,7 @@ public class RestaurantController {
     }
 }
 
-record RequestAddRestaurant(long userId, String restaurant, String description) {}
+record RequestAddRestaurant(String restaurant, String description) {}
 
 record ResponseAddRestaurant(String status) {}
 

@@ -1,0 +1,16 @@
+<header>
+    <h1>
+      <fa-icon
+        [icon]="faBurger"
+      ></fa-icon>
+      {{ title }}
+    </h1>
+    <div *ngIf="me">Hello {{ me.displayName }} <button class="btn" (click)="onLogout()">Logout</button></div>
+</header>
+<div class="message-box"
+  *ngIf="showMessage" 
+  [ngClass]="{ 'message-box-error' : (message.category === 'ERROR') }">
+  <h3>{{ message.category === 'ERROR' ? 'Attention' : 'Information' }}<fa-icon [icon]="faTimes" (click)="onCloseMessage()"></fa-icon></h3>
+  <p>{{ message.message }}</p>
+</div>
+

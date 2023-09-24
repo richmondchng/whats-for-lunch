@@ -1,0 +1,28 @@
+version: "3.8"
+
+#volumes:
+    #mariaDbData:
+    #postgresDbData:
+    #mongoData:
+  
+networks:
+    my_network:
+        driver: bridge
+
+services:
+    backend:
+        image: richmondchng/whatsforlunch
+        build: ./backend
+        container_name: backend
+        restart: always
+        environment:
+            - "JAVA_OPTS=-Dspring.profiles.active=demo,container"
+        ports:
+            - "8080:8080"
+    frontend:
+        image: richmondchng/whatsforlunch-fe
+        build: ./frontend
+        container_name: frontend
+        restart: always
+        ports:
+            - "5000:80"

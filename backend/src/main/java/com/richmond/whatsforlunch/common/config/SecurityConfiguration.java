@@ -27,8 +27,12 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, @Qualifier("mvcHandlerMappingIntrospector") HandlerMappingIntrospector introspector,
-                                                   UserDetailsService userDetailsService, JwtDecoder jwtDecoder, @Qualifier("corsConfiguration") CorsConfigurationSource configurationSource) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   @Qualifier("mvcHandlerMappingIntrospector") HandlerMappingIntrospector introspector,
+                                                   UserDetailsService userDetailsService,
+                                                   JwtDecoder jwtDecoder,
+                                                   @Qualifier("corsConfiguration") CorsConfigurationSource configurationSource)
+            throws Exception {
         MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
         return httpSecurity
                 .csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**"), mvc.pattern("/api/v1/**")))

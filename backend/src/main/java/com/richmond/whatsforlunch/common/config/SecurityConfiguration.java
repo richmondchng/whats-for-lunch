@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,7 +36,7 @@ public class SecurityConfiguration {
             throws Exception {
         MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
         return httpSecurity
-                .csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**"), mvc.pattern("/api/v1/**")))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**"), mvc.pattern(HttpMethod.POST, "/api/v1/tokens")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                         .anyRequest().authenticated()
